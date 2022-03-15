@@ -37,3 +37,15 @@ if __name__ == "__main__":
             cleaned_bird = clean_bird(line["Bird Species, if known"])
             line["Clean Bird Species"] = cleaned_bird
             out.writerow(line)
+            if cleaned_addr not in address_to_bird:
+                address_to_bird[cleaned_addr] = {}
+            address_to_bird[cleaned_addr][cleaned_bird] = address_to_bird[cleaned_addr].get(cleaned_bird, 0)+1
+
+    with open("bldg_counts.csv", mode="w") as f:
+        writer = csv.DictWriter(f, fieldnames = ["Building", "Bird", "Count"])
+        writer.writeheader()
+        for address in sorted(address_to_bird.keys()):
+            for bird in sorted(address_to_bird[address].keys()):
+                writer.writerow({"Building": address, "Bird": bird, "Count": address_to_bird[address][bird]})
+
+
