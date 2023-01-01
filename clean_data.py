@@ -26,7 +26,12 @@ ADDRESS_REPLACEMENTS = [("Consitution", "Constitution"),
                         ("Collumbus", "Columbus")
                        ]
 ADDRESS_ENDINGS = ["Condominiums", "Library"]
-BIRD_REPLACEMENTS = [("?", ""), ("sp.", "species"), ("Rose breasted ", "Rose-breasted ")]
+BIRD_REPLACEMENTS = [("?", ""), ("sp.", "species"),
+                     ("Rose breasted ", "Rose-breasted "),
+                     ("Bay Breasted", "Bay-breasted"),
+                     ("Dove/Pigeon", "Dove"),
+                     ("Rock Pigeon", "Rock Dove")
+                    ]
 DIRECTIONS = ["NE", "NW", "SE", "SW"]
 CHINATOWN_COL = "Chinatown Route: Closest Address"
 UNION_COL = "Union Station  Route: Closest Address"
@@ -78,15 +83,16 @@ def clean_bird(bird: str) -> str:
     bird = bird.split("(")[0].split(",")[0]
     for from_s, to_s in BIRD_REPLACEMENTS:
         bird = bird.replace(from_s, to_s)
-    return bird.strip()
+    return bird.strip().title().replace("'S", "'s")
 
 
-def main(input_fi: str, cleaned_fi: str, count_fi: str) -> None:
+def main(input_fi: str, cleaned_fi: str, address_count_fi: str, bird_count_fi: str) -> None:
     """
     Cleans data and writes outputs
     :param input_fi: Raw input sheet
     :param cleaned_fi: Cleaned version of input_fi
-    :param count_fi: Building-bird count data
+    :param address_count_fi: Building-bird count data
+    :param bird_count_fi: Bird count data
     :return: None
     """
     cleaned_fi_fields = ["Date", "Bird Species, if known", "Clean Bird Species", "Sex, if known",
@@ -97,6 +103,7 @@ def main(input_fi: str, cleaned_fi: str, count_fi: str) -> None:
     out.writeheader()
 
     address_to_bird = {}
+    bird_counts = {}
 
     with open(input_fi) as f:
         for line in csv.DictReader(f):
@@ -118,13 +125,20 @@ def main(input_fi: str, cleaned_fi: str, count_fi: str) -> None:
             if cleaned_addr not in address_to_bird:
                 address_to_bird[cleaned_addr] = {}
             address_to_bird[cleaned_addr][cleaned_bird] = address_to_bird[cleaned_addr].get(cleaned_bird, 0)+1
+            bird_counts[cleaned_bird] = bird_counts.get(cleaned_bird, 0)+1
 
-    with open(count_fi, mode="w") as f:
+    with open(address_count_fi, mode="w") as f:
         writer = csv.DictWriter(f, fieldnames=["Building", "Bird", "Count"])
         writer.writeheader()
         for address in sorted(address_to_bird.keys()):
             for bird in sorted(address_to_bird[address].keys()):
                 writer.writerow({"Building": address, "Bird": bird, "Count": address_to_bird[address][bird]})
+
+    with open(bird_count_fi, mode="w") as f:
+        writer = csv.DictWriter(f, fieldnames=["Bird", "Count"])
+        writer.writeheader()
+        for bird in sorted(bird_counts.keys()):
+            writer.writerow({"Bird": bird, "Count": bird_counts[bird]})
 
 
 if __name__ == "__main__":
@@ -135,4 +149,4 @@ if __name__ == "__main__":
 
     year = re.search(r"\d\d\d\d", args.input_fi)
     output_stub = Path(args.output_dir) / year.group(0)
-    main(args.input_fi, f"{output_stub}_clean.csv", f"{output_stub}_bldg_counts.csv")
+    main(args.input_fi, f"{output_stub}_clean.csv", f"{output_stub}_bldg_counts.csv", f"{output_stub}_bird_counts.csv")
