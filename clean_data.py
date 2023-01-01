@@ -1,3 +1,4 @@
+import argparse
 import csv
 import re
 
@@ -58,8 +59,15 @@ def clean_bird(bird: str) -> str:
     return bird.strip()
 
 
-if __name__ == "__main__":
-    out = csv.DictWriter(open("clean.csv", mode="w"),
+def main(input_fi: str, cleaned_fi: str, count_fi: str) -> None:
+    """
+    Cleans data and writes outputs
+    :param input_fi: Raw input sheet
+    :param cleaned_fi: Cleaned version of input_fi
+    :param count_fi: Building-bird count data
+    :return: None
+    """
+    out = csv.DictWriter(open(cleaned_fi, mode="w"),
                          fieldnames=["Date", "Bird Species, if known", "Clean Bird Species", "Sex, if known",
                                      "Address where found", "Clean Address", "CW Number", "Disposition",
                                      "Status: Released-- Nearest address/landmark", "Last Name", "What route?",
@@ -68,7 +76,7 @@ if __name__ == "__main__":
 
     address_to_bird = {}
 
-    with open("2021 Lights Out Inventory FINAL.csv") as f:
+    with open(input_fi) as f:
         for line in csv.DictReader(f):
             cleaned_addr = clean_address(line["Address where found"])
             line["Clean Address"] = cleaned_addr
@@ -79,11 +87,21 @@ if __name__ == "__main__":
                 address_to_bird[cleaned_addr] = {}
             address_to_bird[cleaned_addr][cleaned_bird] = address_to_bird[cleaned_addr].get(cleaned_bird, 0)+1
 
-    with open("bldg_counts.csv", mode="w") as f:
+    with open(count_fi, mode="w") as f:
         writer = csv.DictWriter(f, fieldnames=["Building", "Bird", "Count"])
         writer.writeheader()
         for address in sorted(address_to_bird.keys()):
             for bird in sorted(address_to_bird[address].keys()):
                 writer.writerow({"Building": address, "Bird": bird, "Count": address_to_bird[address][bird]})
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input_fi", default="2021 Lights Out Inventory FINAL.csv")
+    parser.add_argument("--cleaned_fi", default="clean.csv")
+    parser.add_argument("--count_fi", default="bldg_counts.csv")
+    args = parser.parse_args()
+
+    main(args.input_fi, args.cleaned_fi, args.count_fi)
 
 
