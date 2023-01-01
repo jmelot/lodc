@@ -17,8 +17,15 @@ ADDRESS_REPLACEMENTS = [("Consitution", "Constitution"),
                         ("Eighth", "8th"),
                         ("Ninth", "9th"),
                         ("Street", "St"),
-                        ("Avenue", "Ave")
+                        ("Avenue", "Ave"),
+                        ("Circke", "Circle"),
+                        ("Condos", "Condominiums"),
+                        ("Bldg", "Building"),
+                        ("Thurgood Marshall or 400 North Capitol", "Thurgood Marshall Building"),
+                        ("MLK Jr", "MLK"),
+                        ("Collumbus", "Columbus")
                        ]
+ADDRESS_ENDINGS = ["Condominiums", "Library"]
 BIRD_REPLACEMENTS = [("?", ""), ("sp.", "species"), ("Rose breasted ", "Rose-breasted ")]
 DIRECTIONS = ["NE", "NW", "SE", "SW"]
 CHINATOWN_COL = "Chinatown Route: Closest Address"
@@ -34,10 +41,11 @@ def clean_address(addr: str) -> str:
     :param addr: address string to be normalized
     :return: normalized address
     """
-    clean = addr.replace(".", "")
+    clean = addr.replace(".", "").split(";")[0]
     for direct in DIRECTIONS:
         clean = clean.replace(f", {direct}", f" {direct}")
-    clean = re.sub(rf"({'|'.join(DIRECTIONS)}).*", r"\1", clean).strip()
+        clean = re.sub(rf"(?i)(\b){direct}", rf"\1{direct}", clean)
+    clean = re.sub(rf"(\b)({'|'.join(DIRECTIONS)}).*", r"\1\2", clean).strip()
     parts = clean.split(",")
     street_parts = [p for p in parts if any([direct in p for direct in DIRECTIONS])]
     if len(street_parts) > 0:
@@ -52,7 +60,13 @@ def clean_address(addr: str) -> str:
         clean = paren_parts[0]
     for s_from, s_to in ADDRESS_REPLACEMENTS:
         clean = clean.replace(s_from, s_to)
-    return clean.strip()
+    clean = re.sub(r"Condominium(\b)", r"Condominiums\1", clean)
+    clean = " ".join(clean.strip().split())
+    clean = re.sub(r"(?i)\s+noma(\b|$)", "", clean)
+    for ending in ADDRESS_ENDINGS:
+        clean = re.sub(rf"({ending}).*", r"\1", clean)
+    clean = re.sub("-+", "-", clean)
+    return clean if clean else "No address"
 
 
 def clean_bird(bird: str) -> str:
