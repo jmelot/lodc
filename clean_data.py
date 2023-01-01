@@ -2,6 +2,9 @@ import argparse
 import csv
 import re
 
+from pathlib import Path
+
+
 ADDRESS_REPLACEMENTS = [("Consitution", "Constitution"),
                         ("Maine SW", "Maine Ave SW"),
                         ("First", "1st"),
@@ -98,10 +101,9 @@ def main(input_fi: str, cleaned_fi: str, count_fi: str) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--input_fi", default="2021 Lights Out Inventory FINAL.csv")
-    parser.add_argument("--cleaned_fi", default="clean.csv")
-    parser.add_argument("--count_fi", default="bldg_counts.csv")
+    parser.add_argument("--output_dir", default="LODC_clean")
     args = parser.parse_args()
 
-    main(args.input_fi, args.cleaned_fi, args.count_fi)
-
-
+    year = re.search(r"\d\d\d\d", args.input_fi)
+    output_stub = Path(args.output_dir) / year.group(0)
+    main(args.input_fi, f"{output_stub}_clean.csv", f"{output_stub}_bldg_counts.csv")
