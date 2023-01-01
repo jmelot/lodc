@@ -27,10 +27,11 @@ ADDRESS_REPLACEMENTS = [("Consitution", "Constitution"),
                        ]
 ADDRESS_ENDINGS = ["Condominiums", "Library"]
 BIRD_REPLACEMENTS = [("?", ""), ("sp.", "species"),
-                     ("Rose breasted ", "Rose-breasted "),
-                     ("Bay Breasted", "Bay-breasted"),
                      ("Dove/Pigeon", "Dove"),
-                     ("Rock Pigeon", "Rock Dove")
+                     ("Rock Pigeon", "Rock Dove"),
+                     ("Pigeon/Rock Dove", "Rock Dove"),
+                     (" breasted", "-breasted"),
+                     (" Breasted", "-breasted")
                     ]
 DIRECTIONS = ["NE", "NW", "SE", "SW"]
 CHINATOWN_COL = "Chinatown Route: Closest Address"
