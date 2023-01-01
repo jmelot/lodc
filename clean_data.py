@@ -21,6 +21,11 @@ ADDRESS_REPLACEMENTS = [("Consitution", "Constitution"),
                        ]
 BIRD_REPLACEMENTS = [("?", ""), ("sp.", "species"), ("Rose breasted ", "Rose-breasted ")]
 DIRECTIONS = ["NE", "NW", "SE", "SW"]
+CHINATOWN_COL = "Chinatown Route: Closest Address"
+UNION_COL = "Union Station  Route: Closest Address"
+STREET_COL = "Street Address"
+DEFAULT_ADDR_COL = "Address where found"
+BIRD_COL = "Bird Species, if known"
 
 
 def clean_address(addr: str) -> str:
@@ -70,22 +75,32 @@ def main(input_fi: str, cleaned_fi: str, count_fi: str) -> None:
     :param count_fi: Building-bird count data
     :return: None
     """
-    out = csv.DictWriter(open(cleaned_fi, mode="w"),
-                         fieldnames=["Date", "Bird Species, if known", "Clean Bird Species", "Sex, if known",
+    cleaned_fi_fields = ["Date", "Bird Species, if known", "Clean Bird Species", "Sex, if known",
                                      "Address where found", "Clean Address", "CW Number", "Disposition",
                                      "Status: Released-- Nearest address/landmark", "Last Name", "What route?",
-                                     "Status", "Approx. time you found the bird"])
+                                     "Status", "Approx. time you found the bird"]
+    out = csv.DictWriter(open(cleaned_fi, mode="w"), fieldnames=cleaned_fi_fields)
     out.writeheader()
 
     address_to_bird = {}
 
     with open(input_fi) as f:
         for line in csv.DictReader(f):
-            cleaned_addr = clean_address(line["Address where found"])
+            address_col = DEFAULT_ADDR_COL
+            if address_col not in line:
+                if (CHINATOWN_COL in line) and line[CHINATOWN_COL]:
+                    address_col = CHINATOWN_COL
+                elif (UNION_COL in line) and line[UNION_COL]:
+                    address_col = UNION_COL
+                else:
+                    address_col = STREET_COL
+            cleaned_addr = clean_address(line[address_col])
             line["Clean Address"] = cleaned_addr
-            cleaned_bird = clean_bird(line["Bird Species, if known"])
+            if not line[BIRD_COL]:
+                continue
+            cleaned_bird = clean_bird(line[BIRD_COL])
             line["Clean Bird Species"] = cleaned_bird
-            out.writerow(line)
+            out.writerow({k: v for k, v in line.items() if k in cleaned_fi_fields})
             if cleaned_addr not in address_to_bird:
                 address_to_bird[cleaned_addr] = {}
             address_to_bird[cleaned_addr][cleaned_bird] = address_to_bird[cleaned_addr].get(cleaned_bird, 0)+1
