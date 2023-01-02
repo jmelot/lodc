@@ -5,6 +5,10 @@ import re
 from pathlib import Path
 
 
+CLEAN_SHEET_COLS = ["Date", "Bird Species, if known", "Clean Bird Species", "Sex, if known",
+                                     "Address where found", "Clean Address", "CW Number", "Disposition",
+                                     "Status: Released-- Nearest address/landmark", "Last Name", "What route?",
+                                     "Status", "Approx. time you found the bird"]
 ADDRESS_REPLACEMENTS = [("Consitution", "Constitution"),
                         ("Maine SW", "Maine Ave SW"),
                         ("First", "1st"),
@@ -87,24 +91,19 @@ def clean_bird(bird: str) -> str:
     return bird.strip().title().replace("'S", "'s")
 
 
-def main(input_fi: str, cleaned_fi: str, address_count_fi: str, bird_count_fi: str) -> None:
+def get_cleaned_data(input_fi: str, year: int) -> tuple:
     """
-    Cleans data and writes outputs
-    :param input_fi: Raw input sheet
-    :param cleaned_fi: Cleaned version of input_fi
-    :param address_count_fi: Building-bird count data
-    :param bird_count_fi: Bird count data
-    :return: None
+    Cleans data, returning a tuple of dicts:
+      * Cleaned rows
+      * Dict mapping addresses to years to bird counts
+      * Dict mapping birds to years counts
+    :param input_fi: File containing raw data
+    :param year: Year of data being cleaned
+    :return: Tuple of data dicts as specified above
     """
-    cleaned_fi_fields = ["Date", "Bird Species, if known", "Clean Bird Species", "Sex, if known",
-                                     "Address where found", "Clean Address", "CW Number", "Disposition",
-                                     "Status: Released-- Nearest address/landmark", "Last Name", "What route?",
-                                     "Status", "Approx. time you found the bird"]
-    out = csv.DictWriter(open(cleaned_fi, mode="w"), fieldnames=cleaned_fi_fields)
-    out.writeheader()
-
     address_to_bird = {}
-    bird_counts = {}
+    bird_counts = {year: {}}
+    cleaned_rows = []
 
     with open(input_fi) as f:
         for line in csv.DictReader(f):
@@ -122,24 +121,84 @@ def main(input_fi: str, cleaned_fi: str, address_count_fi: str, bird_count_fi: s
                 continue
             cleaned_bird = clean_bird(line[BIRD_COL])
             line["Clean Bird Species"] = cleaned_bird
-            out.writerow({k: v for k, v in line.items() if k in cleaned_fi_fields})
+            cleaned_rows.append({k: v for k, v in line.items() if k in CLEAN_SHEET_COLS})
             if cleaned_addr not in address_to_bird:
-                address_to_bird[cleaned_addr] = {}
-            address_to_bird[cleaned_addr][cleaned_bird] = address_to_bird[cleaned_addr].get(cleaned_bird, 0)+1
-            bird_counts[cleaned_bird] = bird_counts.get(cleaned_bird, 0)+1
+                address_to_bird[cleaned_addr] = {year: {}}
+            address_to_bird[cleaned_addr][year][cleaned_bird] = address_to_bird[cleaned_addr][year].get(cleaned_bird, 0)+1
+            bird_counts[year][cleaned_bird] = bird_counts[year].get(cleaned_bird, 0)+1
+    return cleaned_rows, address_to_bird, bird_counts
 
-    with open(address_count_fi, mode="w") as f:
-        writer = csv.DictWriter(f, fieldnames=["Building", "Bird", "Count"])
-        writer.writeheader()
-        for address in sorted(address_to_bird.keys()):
-            for bird in sorted(address_to_bird[address].keys()):
-                writer.writerow({"Building": address, "Bird": bird, "Count": address_to_bird[address][bird]})
 
-    with open(bird_count_fi, mode="w") as f:
-        writer = csv.DictWriter(f, fieldnames=["Bird", "Count"])
+def write_clean_sheet(data: list, output_prefix: str) -> None:
+    """
+    Writes cleaned version of raw input data
+    :param data: Cleaned data
+    :param output_prefix: Prefix of output file
+    :return: None
+    """
+    with open(f"{output_prefix}_clean.csv", mode="w") as f:
+        writer = csv.DictWriter(f, fieldnames=CLEAN_SHEET_COLS)
         writer.writeheader()
-        for bird in sorted(bird_counts.keys()):
-            writer.writerow({"Bird": bird, "Count": bird_counts[bird]})
+        for row in data:
+            writer.writerow(row)
+
+
+def write_address_counts(data: dict, output_prefix: str) -> None:
+    """
+    Writes csv mapping addresses to years to bird counts
+    :param data: Dict mapping addresses to years to bird counts
+    :param output_prefix: Prefix of output file
+    :return: None
+    """
+    with open(f"{output_prefix}_bldg_counts.csv", mode="w") as f:
+        writer = csv.DictWriter(f, fieldnames=["Building", "Bird", "Year", "Count"])
+        writer.writeheader()
+        for address in sorted(data.keys()):
+            for year in sorted(data[address].keys()):
+                for bird in data[address][year]:
+                    writer.writerow({
+                        "Building": address,
+                        "Bird": bird,
+                        "Count": data[address][year][bird],
+                        "Year": year
+                    })
+
+
+def write_bird_counts(data: dict, output_prefix: str) -> None:
+    """
+    Writes csv mapping birds to years to bird counts
+    :param data: Dict mapping birds to years to bird counts
+    :param output_prefix: Prefix of output file
+    :return: None
+    """
+    with open(f"{output_prefix}_bird_counts.csv", mode="w") as f:
+        writer = csv.DictWriter(f, fieldnames=["Bird", "Year", "Count"])
+        writer.writeheader()
+        for year in sorted(data.keys()):
+            for bird in data[year]:
+                writer.writerow({
+                    "Bird": bird,
+                    "Count": data[year][bird],
+                    "Year": year
+                })
+
+
+def main(input_fi: str, year: int, output_stub: str) -> None:
+    """
+    Cleans data and writes outputs
+    :param input_fi: Raw input sheet
+    :param year: Year the data is from
+    :param output_stub: Prefix for output files
+    :return: None
+    """
+    cleaned_rows, address_to_bird, bird_counts = get_cleaned_data(input_fi, year)
+    write_clean_sheet(cleaned_rows, output_stub)
+    write_address_counts(address_to_bird, output_stub)
+    write_bird_counts(bird_counts, output_stub)
+
+
+def get_year(filename: str) -> int:
+    return int(re.search(r"\d\d\d\d", filename).group(0))
 
 
 if __name__ == "__main__":
@@ -148,6 +207,6 @@ if __name__ == "__main__":
     parser.add_argument("--output_dir", default="LODC_clean")
     args = parser.parse_args()
 
-    year = re.search(r"\d\d\d\d", args.input_fi)
-    output_stub = Path(args.output_dir) / year.group(0)
-    main(args.input_fi, f"{output_stub}_clean.csv", f"{output_stub}_bldg_counts.csv", f"{output_stub}_bird_counts.csv")
+    year = get_year(args.input_fi)
+    output_stub = Path(args.output_dir) / str(year)
+    main(args.input_fi, year, output_stub)
