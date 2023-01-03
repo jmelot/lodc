@@ -27,15 +27,34 @@ ADDRESS_REPLACEMENTS = [("Consitution", "Constitution"),
                         ("Bldg", "Building"),
                         ("Thurgood Marshall or 400 North Capitol", "Thurgood Marshall Building"),
                         ("MLK Jr", "MLK"),
-                        ("Collumbus", "Columbus")
+                        ("Collumbus", "Columbus"),
+                        ("Nationals Park Stadium", "Nationals Stadium"),
+                        ("Convention Center SE", "Convention Center"),
+                        ("Building E facing window", "building"),
+                        ("Mass Ave", "Massachusetts Ave"),
+                        ("Middle of sidewalk in front of Metropolitan News", ""),
+                        (" in the corner with CVS entrance", ""),
+                        (" east side at corner", ""),
+                        (" Giant", ""),
+                        (" DC 20002", ""),
+                        (" on the MBT trail", ""),
+                        (" North side", ""),
+                        (" In nook of the building on the 21st St side", ""),
+                        (" in front of pool window", ""),
+                        (" in front of parking garage entrance", "")
                        ]
 ADDRESS_ENDINGS = ["Condominiums", "Library"]
 BIRD_REPLACEMENTS = [("?", ""), ("sp.", "species"),
                      ("Dove/Pigeon", "Dove"),
                      ("Rock Pigeon", "Rock Dove"),
                      ("Pigeon/Rock Dove", "Rock Dove"),
-                     (" breasted", "-breasted"),
-                     (" Breasted", "-breasted")
+                     (" Breasted", "-Breasted"),
+                     (" Feathers Only)", ""),
+                     ("Empidonax", "Empidonax Flycatcher Species"),
+                     ("Empid. Flycatcher", "Empidonax Flycatcher Species"),
+                     ("Sp.", "Species"),
+                     ("Grey", "Gray"),
+                     ("Needs Id See Photo", "Unknown")
                     ]
 DIRECTIONS = ["NE", "NW", "SE", "SW"]
 CHINATOWN_COL = "Chinatown Route: Closest Address"
@@ -54,29 +73,35 @@ def clean_address(addr: str) -> str:
     clean = addr.replace(".", "").split(";")[0]
     for direct in DIRECTIONS:
         clean = clean.replace(f", {direct}", f" {direct}")
-        clean = re.sub(rf"(?i)(\b){direct}", rf"\1{direct}", clean)
-    clean = re.sub(rf"(\b)({'|'.join(DIRECTIONS)}).*", r"\1\2", clean).strip()
-    parts = clean.split(",")
-    street_parts = [p for p in parts if any([direct in p for direct in DIRECTIONS])]
-    if len(street_parts) > 0:
-        clean = street_parts[0]
-    elif len(parts) > 0:
-        clean = parts[0]
-    paren_parts = [p.replace(")", "") for p in clean.split("(")]
-    street_paren_parts = [p for p in paren_parts if any([direct in p for direct in DIRECTIONS])]
-    if len(street_paren_parts) > 0:
-        clean = street_paren_parts[0]
-    elif len(paren_parts) > 0:
-        clean = paren_parts[0]
+        clean = re.sub(rf"(?i)(\b){direct}(\b)", rf"\1{direct}\2", clean)
+    if "&" not in clean:
+        clean = re.sub(rf"(\b)({'|'.join(DIRECTIONS)})(\b)", r"\1\2", clean).strip()
+    for sep in [" - ", ",", "("]:
+        clean = clean.split(sep)[0]
     for s_from, s_to in ADDRESS_REPLACEMENTS:
         clean = clean.replace(s_from, s_to)
-    clean = re.sub(r"Condominium(\b)", r"Condominiums\1", clean)
-    clean = " ".join(clean.strip().split())
     clean = re.sub(r"(?i)\s+noma(\b|$)", "", clean)
+    clean = re.sub(r"Condominium(\b)", r"Condominiums\1", clean)
+    for needs_nw in ["Massachusetts Ave", "I St", "Palmer Alley", "New York Ave", "New Jersey Ave", "Wisconsin Ave"]:
+        clean = re.sub(rf"{needs_nw}\s*$", f"{needs_nw} NW", clean)
+    clean = " ".join(clean.strip().split())
     for ending in ADDRESS_ENDINGS:
         clean = re.sub(rf"({ending}).*", r"\1", clean)
+    clean = re.sub(r" to the right.*", "", clean)
     clean = re.sub("-+", "-", clean)
     return clean if clean else "No address"
+
+
+def get_bird_gender(bird: str) -> str:
+    """
+    Attempt to extract bird gender
+    :param bird: Unnormalized bird name
+    :return: Gender ('male' or 'female'), if found
+    """
+    if re.search(r"(?i)\(m\.?\)", bird) or re.search(r"(?i)\bmale\b", bird):
+        return "male"
+    if re.search(r"(?i)\(f\.?\)", bird) or re.search(r"(?i)\bfemale\b", bird):
+        return "female"
 
 
 def clean_bird(bird: str) -> str:
@@ -85,10 +110,10 @@ def clean_bird(bird: str) -> str:
     :param bird: Original name of the bird
     :return: Normalized name of the bird
     """
-    bird = bird.split("(")[0].split(",")[0]
+    bird = bird.split("(")[0].split(",")[0].title().replace("'S", "'s")
     for from_s, to_s in BIRD_REPLACEMENTS:
         bird = bird.replace(from_s, to_s)
-    return bird.strip().title().replace("'S", "'s")
+    return bird.strip()
 
 
 def get_cleaned_data(input_fi: str, year: int) -> tuple:
@@ -119,7 +144,11 @@ def get_cleaned_data(input_fi: str, year: int) -> tuple:
             line["Clean Address"] = cleaned_addr
             if not line[BIRD_COL]:
                 continue
+            if not "Sex, if known" in line:
+                line["Sex, if known"] = get_bird_gender(line[BIRD_COL])
             cleaned_bird = clean_bird(line[BIRD_COL])
+            if cleaned_bird.lower() == "deleted":
+                continue
             line["Clean Bird Species"] = cleaned_bird
             cleaned_rows.append({k: v for k, v in line.items() if k in CLEAN_SHEET_COLS})
             if cleaned_addr not in address_to_bird:
