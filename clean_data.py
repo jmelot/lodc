@@ -44,7 +44,9 @@ ADDRESS_REPLACEMENTS = [("Consitution", "Constitution"),
                         (" North side", ""),
                         (" In nook of the building on the 21st St side", ""),
                         (" in front of pool window", ""),
-                        (" in front of parking garage entrance", "")
+                        (" in front of parking garage entrance", ""),
+                        ("Thurgod Marshall Building", "Thurgood Marshall Building"),
+                        ("MLK library", "MLK Library")
                        ]
 ADDRESS_ENDINGS = ["Condominiums", "Library"]
 BIRD_REPLACEMENTS = [("?", ""), ("sp.", "species"),
@@ -62,7 +64,7 @@ BIRD_REPLACEMENTS = [("?", ""), ("sp.", "species"),
 DIRECTIONS = ["NE", "NW", "SE", "SW"]
 CHINATOWN_COL = "Chinatown Route: Closest Address"
 UNION_COL = "Union Station  Route: Closest Address"
-STREET_COL = "Street Address"
+OTHER_STREET_COLS = ["Street Address", "Location Found"]
 DEFAULT_ADDR_COL = "Address where found"
 BIRD_COL = "Bird Species, if known"
 
@@ -93,6 +95,7 @@ def clean_address(addr: str) -> str:
         clean = re.sub(rf"({ending}).*", r"\1", clean)
     clean = re.sub(r" to the right.*", "", clean)
     clean = re.sub("-+", "-", clean)
+    clean = clean.replace("Thurgood Marshall Building NW", "Thurgood Marshall Building")
     return clean if clean else "No address"
 
 
@@ -143,7 +146,9 @@ def get_cleaned_data(input_fi: str, year: int) -> tuple:
                 elif (UNION_COL in line) and line[UNION_COL]:
                     address_col = UNION_COL
                 else:
-                    address_col = STREET_COL
+                    for col in OTHER_STREET_COLS:
+                        if col in line:
+                            address_col = col
             cleaned_addr = clean_address(line[address_col])
             line["Clean Address"] = cleaned_addr
             line[DEFAULT_ADDR_COL] = line[address_col]
