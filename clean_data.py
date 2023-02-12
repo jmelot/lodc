@@ -146,6 +146,7 @@ def get_cleaned_data(input_fi: str, year: int) -> tuple:
                     address_col = STREET_COL
             cleaned_addr = clean_address(line[address_col])
             line["Clean Address"] = cleaned_addr
+            line[DEFAULT_ADDR_COL] = line[address_col]
             if not line[BIRD_COL]:
                 continue
             if not "Sex, if known" in line:
