@@ -64,7 +64,7 @@ BIRD_REPLACEMENTS = [("?", ""), ("sp.", "species"),
 DIRECTIONS = ["NE", "NW", "SE", "SW"]
 CHINATOWN_COL = "Chinatown Route: Closest Address"
 UNION_COL = "Union Station  Route: Closest Address"
-OTHER_STREET_COLS = ["Street Address", "Location Found"]
+OTHER_STREET_COLS = ["Street Address", "Location Found", "Street Address Where Found"]
 DEFAULT_ADDR_COL = "Address where found"
 BIRD_COL = "Bird Species, if known"
 
