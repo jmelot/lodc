@@ -22,6 +22,9 @@ ADDRESS_REPLACEMENTS = [("Consitution", "Constitution"),
                         ("Ninth", "9th"),
                         ("Street", "St"),
                         ("Avenue", "Ave"),
+                        ("AVE", "Ave"),
+                        (" st ", " St "),
+                        ("N Capitol St", "North Capitol St"),
                         ("Circke", "Circle"),
                         ("Condos", "Condominiums"),
                         ("Bldg", "Building"),
@@ -82,8 +85,9 @@ def clean_address(addr: str) -> str:
         clean = clean.replace(s_from, s_to)
     clean = re.sub(r"(?i)\s+noma(\b|$)", "", clean)
     clean = re.sub(r"Condominium(\b)", r"Condominiums\1", clean)
-    for needs_nw in ["Massachusetts Ave", "I St", "Palmer Alley", "New York Ave", "New Jersey Ave", "Wisconsin Ave"]:
+    for needs_nw in ["Massachusetts Ave", "I St", "Palmer Alley", "New York Ave", "New Jersey Ave", "Wisconsin Ave", "901 4th St"]:
         clean = re.sub(rf"{needs_nw}\s*$", f"{needs_nw} NW", clean)
+    clean = re.sub(r"NW\s*/.*", "NW", clean)
     clean = " ".join(clean.strip().split())
     for ending in ADDRESS_ENDINGS:
         clean = re.sub(rf"({ending}).*", r"\1", clean)
@@ -174,12 +178,12 @@ def write_clean_sheet(data: list, output_prefix: str) -> None:
 
 def write_address_counts(data: dict, output_prefix: str) -> None:
     """
-    Writes csv mapping addresses to years to bird counts
+    Writes csvs mapping addresses to years to bird counts and addresses to bird counts
     :param data: Dict mapping addresses to years to bird counts
     :param output_prefix: Prefix of output file
     :return: None
     """
-    with open(f"{output_prefix}_bldg_counts.csv", mode="w") as f:
+    with open(f"{output_prefix}_bird_bldg_counts.csv", mode="w") as f:
         writer = csv.DictWriter(f, fieldnames=["Building", "Bird", "Year", "Count"])
         writer.writeheader()
         for address in sorted(data.keys()):
@@ -191,6 +195,16 @@ def write_address_counts(data: dict, output_prefix: str) -> None:
                         "Count": data[address][year][bird],
                         "Year": year
                     })
+    with open(f"{output_prefix}_bldg_counts.csv", mode="w") as f:
+        writer = csv.DictWriter(f, fieldnames=["Building", "Year", "Count"])
+        writer.writeheader()
+        for address in sorted(data.keys()):
+            for year in sorted(data[address].keys()):
+                writer.writerow({
+                    "Building": address,
+                    "Count": sum([data[address][year][bird] for bird in data[address][year]]),
+                    "Year": year
+                })
 
 
 def write_bird_counts(data: dict, output_prefix: str) -> None:

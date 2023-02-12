@@ -2,6 +2,7 @@ import argparse
 import os
 
 from pathlib import Path
+from pydantic.utils import deep_update
 from clean_data import get_cleaned_data, write_clean_sheet, write_address_counts, write_bird_counts, get_year
 
 
@@ -20,8 +21,8 @@ def write_data(input_dir: str, output_dir: str) -> None:
         year = get_year(fi)
         curr_cleaned_rows, curr_address_to_bird, curr_bird_counts = get_cleaned_data(Path(input_dir) / fi, year)
         cleaned_rows.extend(curr_cleaned_rows)
-        address_to_bird.update(curr_address_to_bird)
-        bird_counts.update(curr_bird_counts)
+        address_to_bird = deep_update(address_to_bird, curr_address_to_bird)
+        bird_counts = deep_update(bird_counts, curr_bird_counts)
     write_clean_sheet(cleaned_rows, output_stub)
     write_address_counts(address_to_bird, output_stub)
     write_bird_counts(bird_counts, output_stub)
