@@ -2,6 +2,7 @@ import argparse
 import csv
 import re
 
+from collections import OrderedDict
 from pathlib import Path
 
 
@@ -62,11 +63,11 @@ BIRD_REPLACEMENTS = [("?", ""), ("sp.", "species"),
                      ("Needs Id See Photo", "Unknown")
                     ]
 DIRECTIONS = ["NE", "NW", "SE", "SW"]
-CHINATOWN_COL = "Chinatown Route: Closest Address"
-UNION_COL = "Union Station  Route: Closest Address"
-OTHER_STREET_COLS = ["Street Address", "Location Found", "Street Address Where Found"]
 DEFAULT_ADDR_COL = "Address where found"
-BIRD_COL = "Bird Species, if known"
+ALT_ADDR_COLS = [DEFAULT_ADDR_COL, "Chinatown Route: Closest Address", "Union Station  Route: Closest Address",
+            "address1", "address2", "Street Address", "Location Found", "Street Address Where Found", "notes"]
+DEFAULT_BIRD_COL = "Bird Species, if known"
+ALT_BIRD_COLS = [DEFAULT_BIRD_COL, "species"]
 
 
 def clean_address(addr: str) -> str:
@@ -75,6 +76,9 @@ def clean_address(addr: str) -> str:
     :param addr: address string to be normalized
     :return: normalized address
     """
+    no_addr = "No address"
+    if not addr:
+        return no_addr
     clean = addr.replace(".", "").split(";")[0]
     for direct in DIRECTIONS:
         clean = clean.replace(f", {direct}", f" {direct}")
@@ -96,7 +100,7 @@ def clean_address(addr: str) -> str:
     clean = re.sub(r" to the right.*", "", clean)
     clean = re.sub("-+", "-", clean)
     clean = clean.replace("Thurgood Marshall Building NW", "Thurgood Marshall Building")
-    return clean if clean else "No address"
+    return clean if clean else no_addr
 
 
 def get_bird_gender(bird: str) -> str:
@@ -123,6 +127,18 @@ def clean_bird(bird: str) -> str:
     return bird.strip()
 
 
+def get_variably_named_val(column_alts: list, line: OrderedDict) -> str:
+    """
+    Return the value of the first address column alias that is not null
+    :param column_alts: Different names for the same column
+    :param line: OrderedDict representing the mapping from column names to values
+    :return: The first non-null value in line of one of the `column_alts`
+    """
+    for alt in column_alts:
+        if line.get(alt):
+            return line[alt]
+
+
 def get_cleaned_data(input_fi: str, year: int) -> tuple:
     """
     Cleans data, returning a tuple of dicts:
@@ -139,27 +155,25 @@ def get_cleaned_data(input_fi: str, year: int) -> tuple:
 
     with open(input_fi) as f:
         for line in csv.DictReader(f):
-            address_col = DEFAULT_ADDR_COL
-            if address_col not in line:
-                if (CHINATOWN_COL in line) and line[CHINATOWN_COL]:
-                    address_col = CHINATOWN_COL
-                elif (UNION_COL in line) and line[UNION_COL]:
-                    address_col = UNION_COL
-                else:
-                    for col in OTHER_STREET_COLS:
-                        if col in line:
-                            address_col = col
-            cleaned_addr = clean_address(line[address_col])
-            line["Clean Address"] = cleaned_addr
-            line[DEFAULT_ADDR_COL] = line[address_col]
-            if not line[BIRD_COL]:
+            # clean up bird species
+            raw_bird = get_variably_named_val(ALT_BIRD_COLS, line)
+            if not raw_bird:
                 continue
             if not "Sex, if known" in line:
-                line["Sex, if known"] = get_bird_gender(line[BIRD_COL])
-            cleaned_bird = clean_bird(line[BIRD_COL])
+                line["Sex, if known"] = get_bird_gender(raw_bird)
+            cleaned_bird = clean_bird(raw_bird)
             if cleaned_bird.lower() == "deleted":
                 continue
+            line[DEFAULT_BIRD_COL] = raw_bird
             line["Clean Bird Species"] = cleaned_bird
+            # clean up address
+            raw_addr = get_variably_named_val(ALT_ADDR_COLS, line)
+            if not raw_addr:
+                print(f"Warning, no address for line: {line}")
+            cleaned_addr = clean_address(raw_addr)
+            line["Clean Address"] = cleaned_addr
+            line[DEFAULT_ADDR_COL] = raw_addr
+
             cleaned_rows.append({k: v for k, v in line.items() if k in CLEAN_SHEET_COLS})
             if cleaned_addr not in address_to_bird:
                 address_to_bird[cleaned_addr] = {year: {}}
