@@ -50,17 +50,83 @@ ADDRESS_REPLACEMENTS = [("Consitution", "Constitution"),
                         ("MLK library", "MLK Library")
                        ]
 ADDRESS_ENDINGS = ["Condominiums", "Library"]
-BIRD_REPLACEMENTS = [("?", ""), ("sp.", "species"),
-                     ("Dove/Pigeon", "Dove"),
+BIRD_SUBSTRING_MAPPINGS = [
+    ("?", ""), ("sp.", "species"),
+    (" Breasted", "-Breasted"),
+    (" Feathers Only)", ""),
+    ("Sp.", "Species"),
+    ("Grey", "Gray"),
+]
+UNKNOWN_BIRD = "Unknown"
+EMPID = "Empidonax Species"
+BIRD_REPLACEMENTS = [("Dove/Pigeon", "Rock Dove"),
                      ("Rock Pigeon", "Rock Dove"),
                      ("Pigeon/Rock Dove", "Rock Dove"),
-                     (" Breasted", "-Breasted"),
-                     (" Feathers Only)", ""),
-                     ("Empidonax", "Empidonax Flycatcher Species"),
-                     ("Empid. Flycatcher", "Empidonax Flycatcher Species"),
-                     ("Sp.", "Species"),
-                     ("Grey", "Gray"),
-                     ("Needs Id See Photo", "Unknown")
+                     ("Empidonax", EMPID),
+                     ("Empid. Flycatcher", EMPID),
+                     ("Needs Id See Photo", UNKNOWN_BIRD),
+                     ("Alder", "Alder Flycatcher"),
+                     ("", UNKNOWN_BIRD),
+                     ("Black And White Warbler", "Black-And-White Warbler"),
+                     ("Black Throated Blue Warbler", "Black-Throated Blue Warbler"),
+                     ("Black Throated Green Warbler", "Black-Throated Green Warbler"),
+                     ("Blue-Throated Black Warbler", "Black-Throated Blue Warbler"),
+                     ("Clay Colored Or Chipping Sparrow", "Sparrow Species"),
+                     ("Dark Eyed Junco", "Dark-Eyed Junco"),
+                     ("Eastern Wood Pewee", "Eastern Wood-Pewee"),
+                     ("Empidonax Flycatcher Species Species Flycatcher", EMPID),
+                     ("Empidomax Species", EMPID),
+                     ("Flicker", "Northern Flicker"),
+                     ("Flycatcher", EMPID),
+                     ("Black-Throated Blue", "Black-Throated Blue Warbler"),
+                     ("Gray Cheeked Thrush", "Gray-Cheeked Thrush"),
+                     ("Junco", "Dark-Eyed Junco"),
+                     ("Likely A Warbler", "Warbler Species"),
+                     ("Kinglet", "Kinglet Species"),
+                     ("Mallard", "Mallard Duck"),
+                     ("Mourning Or Connecticut Warbler", "Warbler Species"),
+                     ("Northern Parula Warbler", "Northern Parula"),
+                     ("Northern Water Thrush", "Northern Waterthrush"),
+                     ("Nuthatch", "Nuthatch Species"),
+                     ("Ovenbird--1 Of 2 Found", "Ovenbird"),
+                     ("Pewee And Flycatcher", EMPID),
+                     ("Pied Billed Grebe", "Pied-Billed Grebe"),
+                     ("Pigeon", "Rock Dove"),
+                     ("Red Bellied Woodpecker", "Red-Bellied Woodpecker"),
+                     ("Red Eyed Vireo", "Red-Eyed Vireo"),
+                     ("Robin", "American Robin"),
+                     ("Rock Dove/Pigeon", "Rock Dove"),
+                     ("Ruby Crowned Kinglet", "Ruby-Crowned Kinglet"),
+                     ("Ruby Throated Hummingbird", "Ruby-Throated Hummingbird"),
+                     ("Rufous Sided Towhee", "Rufous-Sided Towhee"),
+                     ("Savannah", "Savannah Sparrow"),
+                     ("Sparrow", "Sparrow Species"),
+                     ("Swainsons Thrush", "Swainson's Thrush"),
+                     ("Swaison's Thrush", "Swainson's Thrush"),
+                     ("Tennesee Warbler", "Tennessee Warbler"),
+                     ("Thrush Or Sparrow", UNKNOWN_BIRD),
+                     ("Thrush", "Thrush Species"),
+                     ("Warbler Species - Possible Yellow-Rumped", "Warbler Species"),
+                     ("White Throated Sparrow", "White-Throated Sparrow"),
+                     ("Whippoorwill", "Whip-Poor-Will"),
+                     ("Woodcock", "American Woodcock"),
+                     ("Woodpecker", "Woodpecker Species"),
+                     ("Yellow Bellied Sapsucker", "Yellow-Bellied Sapsucker"),
+                     ("Yellow Billed Cuckoo", "Yellow-Billed Cuckoo"),
+                     ("Yellow Rumped Warbler", "Yellow-Rumped Warbler"),
+                     ("Yellowbreasted Flycatcher", "Yellow-Bellied Flycatcher"),
+                     ("Yellowthroat", "Common Yellowthroat"),
+                     ("Cardinal", "American Cardinal"),
+                     ("Catbird", "Gray Catbird"),
+                     ("Golden Crowned Kinglet", "Golden-Crowned Kinglet"),
+                     ("Goldfinch", "American Goldfinch"),
+                     ("Grackle", "Common Grackle"),
+                     ("Hummingbird", "Hummingbird Species"),
+                     ("Parula Warbler", "Northern Parula"),
+                     ("Starling", "European Starling"),
+                     ("Warbler", "Warbler Species"),
+                     ("Empidonax Species Flycatcher", EMPID),
+                     ("Mockingbird", "Northern Mockingbird")
                     ]
 DIRECTIONS = ["NE", "NW", "SE", "SW"]
 DEFAULT_ADDR_COL = "Address where found"
@@ -122,9 +188,16 @@ def clean_bird(bird: str) -> str:
     :param bird: Original name of the bird
     :return: Normalized name of the bird
     """
-    bird = bird.split("(")[0].split(",")[0].title().replace("'S", "'s")
-    for from_s, to_s in BIRD_REPLACEMENTS:
+    bird = bird.split("(")[0].split(",")[0].title().replace("'S", "'s").strip()
+    bird = " ".join(bird.split())
+    for from_s, to_s in BIRD_SUBSTRING_MAPPINGS:
         bird = bird.replace(from_s, to_s)
+    for from_s, to_s in BIRD_REPLACEMENTS:
+        if bird == from_s:
+            bird = to_s
+    if ("Unidentified" in bird) or ("Unknown" in bird):
+        bird = UNKNOWN_BIRD
+    bird = re.sub(r" Sp$", " Species", bird)
     return bird.strip()
 
 
@@ -158,7 +231,7 @@ def get_cleaned_data(input_fi: str, year: int) -> tuple:
         for line in csv.DictReader(f):
             # clean up bird species
             raw_bird = get_variably_named_val(ALT_BIRD_COLS, line)
-            if not raw_bird:
+            if (not raw_bird) or (raw_bird == "Not used"):
                 continue
             if not "Sex, if known" in line:
                 line["Sex, if known"] = get_bird_gender(raw_bird)
