@@ -66,7 +66,7 @@ DIRECTIONS = ["NE", "NW", "SE", "SW"]
 DEFAULT_ADDR_COL = "Address where found"
 ALT_ADDR_COLS = [DEFAULT_ADDR_COL, "Chinatown Route: Closest Address", "Union Station  Route: Closest Address",
             "address1", "address2", "Street Address", "Location Found", "Street Address Where Found", "notes",
-            "Location "]
+            "Location ", "Location"]
 DEFAULT_BIRD_COL = "Bird Species, if known"
 ALT_BIRD_COLS = [DEFAULT_BIRD_COL, "Species", "species"]
 
