@@ -6,8 +6,8 @@ from collections import OrderedDict
 from pathlib import Path
 
 from constants import ADDRESS_ENDINGS, ADDRESS_REPLACEMENTS, ALT_ADDR_COLS, ALT_BIRD_COLS, \
-    BIRD_REPLACEMENTS, BIRD_SUBSTRING_MAPPINGS, CLEAN_SHEET_COLS, CONVENTION_CTR, DEFAULT_ADDR_COL, \
-    DEFAULT_BIRD_COL, DIRECTIONS, GU, PRE_CLEAN_ADDRESS_REPLACEMENTS, THURGOOD, \
+    BIRD_REPLACEMENTS, BIRD_SUBSTRING_MAPPINGS, CLEAN_SHEET_COLS, DEFAULT_ADDR_COL, \
+    DEFAULT_BIRD_COL, DIRECTIONS, NEEDS_NW, PRE_CLEAN_ADDRESS_REPLACEMENTS, \
     UNKNOWN_ADDRESS, UNKNOWN_BIRD, UNKNOWN_DATE
 
 
@@ -21,7 +21,8 @@ def clean_address(addr: str) -> str:
         return UNKNOWN_ADDRESS
     clean = " ".join(addr.replace("\n", " ").replace("\r", " ").split())
     for s_from, s_to in PRE_CLEAN_ADDRESS_REPLACEMENTS:
-        clean = clean.replace(s_from, s_to)
+        if clean == s_from:
+            clean = s_to
     clean = clean.replace(".", "").split(";")[0].strip().replace("\n", " ")
     clean = clean.replace("&", "and").replace(" And ", " and ")
     for direct in DIRECTIONS:
@@ -33,7 +34,7 @@ def clean_address(addr: str) -> str:
         clean = clean.replace(s_from, s_to)
     clean = re.sub(r"(?i)\s+noma(\b|$)", "", clean)
     clean = re.sub(r"Condominium(\b)", r"Condominiums\1", clean)
-    for needs_nw in ["Massachusetts Ave", "I St", "Palmer Alley", "New York Ave", "New Jersey Ave", "Wisconsin Ave", "901 4th St"]:
+    for needs_nw in NEEDS_NW:
         clean = re.sub(rf"{needs_nw}\s*$", f"{needs_nw} NW", clean)
     clean = re.sub(r"NW\s*/.*", "NW", clean)
     clean = " ".join(clean.strip().split())
@@ -41,52 +42,7 @@ def clean_address(addr: str) -> str:
         clean = re.sub(rf"({ending}).*", r"\1", clean)
     clean = re.sub(r" to the right.*", "", clean)
     clean = re.sub("-+", "-", clean)
-    clean = clean.replace("Thurgood Marshall Building NW", THURGOOD).replace(" NE Building", "")
     clean = clean.replace("NW NW", "NW")
-    for from_s, to_s in [
-        ("1 Columbus Circle NW", "1 Columbus Circle NE"),
-        ("1 Columbus Circle", "1 Columbus Circle NE"),
-        ("920 Mass", "920 Massachusetts Ave NW"),
-        ("900 Mass", "900 Massachusetts Ave NW"),
-        ("1 Dupont Circle NW side", "1 Dupont Circle NW"),
-        ("801 Mt Vernon Pl NW corner at 7th and New York Ave NW", "801 Mt Vernon Pl NW"),
-        ("850 10th St NW at the corner with Palmer Alley NW", "850 10th St NW"),
-        ("931 H St NW or 900 Palmer Alley NW", "900 Palmer Alley NW"),
-        ("Across from 1813 Wiltberger NW", "1813 Wiltberger NW"),
-        ("ATF Building", "99 New York Ave NE"),
-        ("Alley", UNKNOWN_ADDRESS),
-        ("BB and T Bank", UNKNOWN_ADDRESS),
-        ("Capital City Charter School", "100 Peabody St NW"),
-        ("Connecticut Ave NW M St NW", "Connecticut Ave and M St NW"),
-        ("Constitution Ave NW 10th St NW", "Constitution Ave and 10th St NW"),
-        ("Convention Center NW", CONVENTION_CTR),
-        ("Convention Center", CONVENTION_CTR),
-        ("DOE Building", "1000 Independence Avenue SW"),
-        ("Lauinger Library", GU),
-        ("Lincoln Memorial", "2 Lincoln Memorial Cir NW"),
-        ("M St NW 17th St NW", "M St and 17th St NW"),
-        ("M St and 17th Tt NW", "M St and 17th St NW"),
-        ("Found at NW corner", "1490 7th St NW"),
-        ("NW corner", "18th St and K St NW"),
-        ("O'Neill Federal Building", "200 C Street SW"),
-        ("The 3001 Connecticut Ave NW", "3001 Connecticut Ave NW"),
-        ("US Botanic Garden", "100 Maryland Ave SW"),
-        ("US Botanic Garden atrium", "100 Maryland Ave SW"),
-        ("US Capitol", "First St SE"),
-        ("Union Station", "50 Massachusetts Ave NE"),
-        ("Verizon Center", "601 F St NW"),
-        ("Whole Foods", UNKNOWN_ADDRESS),
-        ("Wisc and Massachusetts Ave NW", "Wisc Ave and Massachusetts Ave NW"),
-        ("entry", "430 E St NW"),
-        ("glass entry", "430 E St NW"),
-        ("glass entry 430 NW", "430 E St NW"),
-        ("1000", "1000 Massachusetts Ave NW"),
-        ("Glass entry", "430 E St NW"),
-        ("430 E", "430 E St NW"),
-        ("430 NW", "430 E St NW")
-    ]:
-        if clean == from_s:
-            clean = to_s
     return clean if clean else UNKNOWN_ADDRESS
 
 
