@@ -17,6 +17,7 @@ NATIONALS = "1500 S Capitol St SE"
 BOTANIC = "100 Maryland Ave SW"
 ZOO = "3001 Connecticut Ave NW"
 DOE = "1000 Independence Ave SW"
+CAP_CITY_SCHOOL = "100 Peabody St NW"
 ADDRESS_REPLACEMENTS = [
     ("corner at 7th and New York Ave NW", ""),
     ("at the corner with Palmer Alley NW", ""),
@@ -141,7 +142,7 @@ ADDRESS_REPLACEMENTS = [
     ("I found this bird while on my lunch break It was still warm at approx 1 pm Found in front of 1040 17th St NW", "1040 17th St NW"),
     ("In front of Audi Field Sports Shop main door facing north R St SW", AUDI),
     ("M St side of 1275 1st St NE", "1275 1st St NE"),
-    ("M and 17th NW corner", "M St and 17th Tt NW"),
+    ("M and 17th NW corner", "M St and 17th St NW"),
     ("South side of 1601 K St", "1601 K St NW"),
     ("glass entry 430 E St NW", "430 E St NW"),
     ("World Bank 1818 H St NW", "1818 H St NW"),
@@ -223,7 +224,10 @@ ADDRESS_REPLACEMENTS = [
     ("Building", "")
 ]
 PRE_CLEAN_ADDRESS_REPLACEMENTS = [
-    ("850 10th St NW at the corner with Palmer Alley NW", "850 10th St NW"),
+    ("900 Mass. (So. side at glass passageway)", "900 Massachusetts Ave NW"),
+    ("1000, Massachusetts Ave NW", "1000 Massachusetts Ave NW"),
+    ("799 9th St NW and Bouqueria Entrance", "799 9th St NW"),
+    ("850 10th St NW at the corner with Palmer Alley", "850 10th St NW"),
     ("Lincoln Memorial, Washington, DC", "2 Lincoln Memorial Circle NW"),
     ("1 Columbus Circle NE Building", "1 Columbus Circle NE"),
     ("1 Columbus Circle NW", "1 Columbus Circle NE"),
@@ -233,17 +237,15 @@ PRE_CLEAN_ADDRESS_REPLACEMENTS = [
     ("2701 MLK Ave SE", "2701 Martin Luther King Jr Ave SE"),
     ("430 E St. NW, glass entry", "430 E St NW"),
     ("801 Mt Vernon Pl NW corner at 7th and New York Ave NW", "801 Mt Vernon Pl NW"),
-    ("850 10th St NW at the corner with Palmer Alley NW", "850 10th St NW"),
     ("900 Mass", "900 Massachusetts Ave NW"),
     ("920 Mass", "920 Massachusetts Ave NW"),
-    ("931 H St NW or 900 Palmer Alley NW", "900 Palmer Alley NW"),
+    ("931 H Street NW or 900 Palmer Alley NW, courtyard side of DBGB", "900 Palmer Alley NW"),
     ("950 - 980 Maine SW, east side between buildings", "950-980 Maine Ave SW"),
     ("Across from 1813 Wiltberger NW", "1813 Wiltberger NW"),
     ("Alley", UNKNOWN_ADDRESS),
     ("Alley, Capitol Hill", UNKNOWN_ADDRESS),
     ("Audi Stadium by store door fronting R Street SW and facing North.", AUDI),
     ("BB and T Bank", UNKNOWN_ADDRESS),
-    ("Capital City Charter School", "100 Peabody St NW"),
     ("Connecticut Ave NW M St NW", "Connecticut Ave and M St NW"),
     ("Constitution Ave NW 10th St NW", "Constitution Ave and 10th St NW"),
     ("Eagle Bank, NW corner, 20th and K Sts. NW", "20th St NW and K St NW"),
@@ -270,6 +272,7 @@ PRE_CLEAN_ADDRESS_REPLACEMENTS = [
     ("NW corner", "18th St and K St NW"),
     ("NW corner, 18th and K Sts. NW", "18th St and K St NW"),
     ("O'Neill Federal Building", "200 C Street SW"),
+    ("O'Neill Federal Building, 2nd and C Streets, SW", "200 C Street SW"),
     ("The 3001 Connecticut Ave NW", "3001 Connecticut Ave NW"),
     ("US Capitol", "First St SE"),
     ("Union Station", "50 Massachusetts Ave NE"),
@@ -286,7 +289,8 @@ PRE_CLEAN_ADDRESS_REPLACEMENTS = [
     ("Wisc. and Mass. Ave., NW", "Wisconsin Ave and Massachusetts Ave NW"),
     ("920 Mass. (N. side at glass passageway)", "920 Massachusetts Ave NW"),
     ("920 Mass. (So. side at glass passageway)", "920 Massachusetts Ave NW"),
-    ("Across from 1813 Wiltberger NW, WeWork Shaw Building", "1813 Wiltberger St NW")
+    ("Across from 1813 Wiltberger NW, WeWork Shaw Building", "1813 Wiltberger St NW"),
+    ("One Dupont Circle, NW side", "1 Dupont Circle NW")
 ]
 ALWAYS_SUBS = [
     (r"(?i)^(The )?Convention Center", CONVENTION_CTR),
@@ -294,7 +298,8 @@ ALWAYS_SUBS = [
     (r"(?i)^(The )?National Zoo", ZOO),
     (r"(?i)^DOE Building", DOE),
     (r"(?i)Lauinger Library", GU),
-    (r"(?i)Thurgood Marshall", THURGOOD)
+    (r"(?i)Thurgood Marshall", THURGOOD),
+    (r"(?i)Capital City Charter School", CAP_CITY_SCHOOL)
 ]
 
 ADDRESS_ENDINGS = ["Condominiums", "Library"]
