@@ -2,7 +2,7 @@ import unittest
 
 from collections import OrderedDict
 
-from ..clean_data import clean_address, clean_date
+from ..clean_data import clean_address, clean_date, clean_bird
 from ..constants import CONVENTION_CTR, MLK, UNKNOWN_DATE, THURGOOD, DOE, GU
 
 
@@ -60,3 +60,9 @@ class TestCleanData(unittest.TestCase):
 
     def test_malformatted_date(self):
         self.assertEqual(UNKNOWN_DATE, clean_date(OrderedDict({"date": "12/12"})))
+
+    def test_clean_bird(self):
+        self.assertEqual("Alder Flycatcher", clean_bird("Alder"))
+        self.assertEqual("Alder Flycatcher", clean_bird("Alder Flycatcher"))
+        self.assertEqual("Warbler Species", clean_bird("Warbler sp."))
+        self.assertEqual("Warbler Species", clean_bird("Warbler sp"))
