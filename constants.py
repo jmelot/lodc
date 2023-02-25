@@ -14,6 +14,9 @@ HART_SENATE = "120 Constitution Ave NE"
 TEAMSTERS = "25 Louisiana Ave NW"
 CONVENTION_CTR = "801 Mt Vernon Pl NW"
 NATIONALS = "1500 S Capitol St SE"
+BOTANIC = "100 Maryland Ave SW"
+ZOO = "3001 Connecticut Ave NW"
+DOE = "1000 Independence Ave SW"
 ADDRESS_REPLACEMENTS = [
     ("corner at 7th and New York Ave NW", ""),
     ("at the corner with Palmer Alley NW", ""),
@@ -36,11 +39,9 @@ ADDRESS_REPLACEMENTS = [
     ("Circke", "Circle"),
     ("Condos", "Condominiums"),
     ("Bldg", "Building"),
-    ("Thurgood Marshall or 400 North Capitol", THURGOOD),
     ("MLK Jr", MLK),
     ("Collumbus", "Columbus"),
     ("Nationals Park Stadium", NATIONALS),
-    ("Convention Center SE", CONVENTION_CTR),
     ("Building E facing window", "building"),
     ("Mass Ave", "Massachusetts Ave"),
     ("Middle of sidewalk in front of Metropolitan News", ""),
@@ -100,8 +101,6 @@ ADDRESS_REPLACEMENTS = [
     ("18th and Pennsylvania NW", "18th and Pennsylvania Ave NW"),
     (" and Bouqueria Entrance", ""),
     (" corner of 7th and Mt Vernon", ""),
-    ("Convention Center corner at 7th and NY Ave", "7th St and New York Ave NW"),
-    ("Convention Center overpass", "801 Mt Vernon Pl NW"),
     ("Corner of H St and 18th", "H St and 18th St NW"),
     ("Corner of New Jersey and D St NW", "New Jersey Ave and D St NW"),
     ("Date and location unknown", UNKNOWN_ADDRESS),
@@ -127,7 +126,6 @@ ADDRESS_REPLACEMENTS = [
     ("GU Law School Library", "111 G St NW"),
     ("GU Sport and Fitness Center", GU_LAW),
     ("GW Hospital", "3800 Reservoir Rd NW"),
-    ("Georgetown University Lauinger Library", GU),
     ("Georgetown Law School", GU_LAW),
     ("Georgetown Law School Fitness Center", GU_LAW),
     ("Georgetown Law Sport and Fitness Center", GU_LAW),
@@ -165,7 +163,6 @@ ADDRESS_REPLACEMENTS = [
     ("National Arboretum", UNKNOWN_ADDRESS),
     ("National Geographic", "1145 17th St NW"),
     ("National Mall", UNKNOWN_ADDRESS),
-    ("National Zoo", "3001 Connecticut Ave NW"),
     ("Nationals Stadium", NATIONALS),
     ("Old Soldiers and Sailors Home NW", "140 Rock Creek Church Rd NW #7"),
     ("On east side of Metropolitan Branch Trail at R St NE", "Metropolitan Branch Trail and R St NE"),
@@ -187,10 +184,6 @@ ADDRESS_REPLACEMENTS = [
     ("Teamsters Building", TEAMSTERS),
     ("Teamsters' Building", TEAMSTERS),
     ("Techworld Plaza", "800 K St NW"),
-    ("The Convention Center", CONVENTION_CTR),
-    ("The National Zoo", "3001 Connecticut Ave NW"),
-    ("Thurgood Marshall Building", THURGOOD),
-    ("Thurgood Marshall", THURGOOD),
     ("Tumi Store", "1051 H St NW"),
     ("Washington DC", UNKNOWN_ADDRESS),
     ("Washington Monument", "2 15th St NW"),
@@ -226,8 +219,12 @@ ADDRESS_REPLACEMENTS = [
     ("901 G St NW Library", MLK),
     ("901 G St NW 901 G St NW", MLK),
     (": next to curb in road", ""),
+    ("ATF Building", "99 New York Ave NE"),
+    ("Building", "")
 ]
 PRE_CLEAN_ADDRESS_REPLACEMENTS = [
+    ("850 10th St NW at the corner with Palmer Alley NW", "850 10th St NW"),
+    ("Lincoln Memorial, Washington, DC", "2 Lincoln Memorial Circle NW"),
     ("1 Columbus Circle NE Building", "1 Columbus Circle NE"),
     ("1 Columbus Circle NW", "1 Columbus Circle NE"),
     ("1 Columbus Circle", "1 Columbus Circle NE"),
@@ -241,7 +238,6 @@ PRE_CLEAN_ADDRESS_REPLACEMENTS = [
     ("920 Mass", "920 Massachusetts Ave NW"),
     ("931 H St NW or 900 Palmer Alley NW", "900 Palmer Alley NW"),
     ("950 - 980 Maine SW, east side between buildings", "950-980 Maine Ave SW"),
-    ("ATF Building", "99 New York Ave NE"),
     ("Across from 1813 Wiltberger NW", "1813 Wiltberger NW"),
     ("Alley", UNKNOWN_ADDRESS),
     ("Alley, Capitol Hill", UNKNOWN_ADDRESS),
@@ -250,9 +246,6 @@ PRE_CLEAN_ADDRESS_REPLACEMENTS = [
     ("Capital City Charter School", "100 Peabody St NW"),
     ("Connecticut Ave NW M St NW", "Connecticut Ave and M St NW"),
     ("Constitution Ave NW 10th St NW", "Constitution Ave and 10th St NW"),
-    ("Convention Center NW", CONVENTION_CTR),
-    ("Convention Center", CONVENTION_CTR),
-    ("DOE Building", "1000 Independence Avenue SW"),
     ("Eagle Bank, NW corner, 20th and K Sts. NW", "20th St NW and K St NW"),
     ("Found at NW corner (8th & P side) of the newer apartment building at 1490 7th St NW (the north half of the building containing the Giant).",
         "1490 7th St NW"),
@@ -271,7 +264,6 @@ PRE_CLEAN_ADDRESS_REPLACEMENTS = [
     ("Glass entry, 430 E st., NW", "430 E St NW"),
     ("Glass entry, west side 430 E St., NW WDC", "430 E St NW"),
     ("Glass entry, west side", UNKNOWN_ADDRESS),
-    ("Lauinger Library", GU),
     ("Lincoln Memorial", "2 Lincoln Memorial Cir NW"),
     ("M St NW 17th St NW", "M St and 17th St NW"),
     ("M St and 17th Tt NW", "M St and 17th St NW"),
@@ -279,8 +271,6 @@ PRE_CLEAN_ADDRESS_REPLACEMENTS = [
     ("NW corner, 18th and K Sts. NW", "18th St and K St NW"),
     ("O'Neill Federal Building", "200 C Street SW"),
     ("The 3001 Connecticut Ave NW", "3001 Connecticut Ave NW"),
-    ("US Botanic Garden atrium", "100 Maryland Ave SW"),
-    ("US Botanic Garden", "100 Maryland Ave SW"),
     ("US Capitol", "First St SE"),
     ("Union Station", "50 Massachusetts Ave NE"),
     ("Verizon Center", "601 F St NW"),
@@ -293,6 +283,18 @@ PRE_CLEAN_ADDRESS_REPLACEMENTS = [
     ("glass entry 430 E St., NW", "430 E St NW"),
     ("glass entry, 430 E St NW, WDC", "430 E St NW"),
     ("glass entry, 430 E St., NW, WDC", "430 E St NW"),
+    ("Wisc. and Mass. Ave., NW", "Wisconsin Ave and Massachusetts Ave NW"),
+    ("920 Mass. (N. side at glass passageway)", "920 Massachusetts Ave NW"),
+    ("920 Mass. (So. side at glass passageway)", "920 Massachusetts Ave NW"),
+    ("Across from 1813 Wiltberger NW, WeWork Shaw Building", "1813 Wiltberger St NW")
+]
+ALWAYS_SUBS = [
+    (r"(?i)^(The )?Convention Center", CONVENTION_CTR),
+    (r"(?i)^(The )?US Botanic", BOTANIC),
+    (r"(?i)^(The )?National Zoo", ZOO),
+    (r"(?i)^DOE Building", DOE),
+    (r"(?i)Lauinger Library", GU),
+    (r"(?i)Thurgood Marshall", THURGOOD)
 ]
 
 ADDRESS_ENDINGS = ["Condominiums", "Library"]

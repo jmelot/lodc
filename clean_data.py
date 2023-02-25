@@ -8,7 +8,7 @@ from pathlib import Path
 from constants import ADDRESS_ENDINGS, ADDRESS_REPLACEMENTS, ALT_ADDR_COLS, ALT_BIRD_COLS, \
     BIRD_REPLACEMENTS, BIRD_SUBSTRING_MAPPINGS, CLEAN_SHEET_COLS, DEFAULT_ADDR_COL, \
     DEFAULT_BIRD_COL, DIRECTIONS, NEEDS_NW, PRE_CLEAN_ADDRESS_REPLACEMENTS, \
-    UNKNOWN_ADDRESS, UNKNOWN_BIRD, UNKNOWN_DATE
+    UNKNOWN_ADDRESS, UNKNOWN_BIRD, UNKNOWN_DATE, ALWAYS_SUBS
 
 
 def clean_address(addr: str) -> str:
@@ -23,9 +23,14 @@ def clean_address(addr: str) -> str:
     for s_from, s_to in PRE_CLEAN_ADDRESS_REPLACEMENTS:
         if clean == s_from:
             clean = s_to
+    for s_search, s_to in ALWAYS_SUBS:
+        if re.search(s_search, clean):
+            clean = s_to
+    # fix case of directions
     clean = clean.replace(".", "").split(";")[0].strip().replace("\n", " ")
     clean = clean.replace("&", "and").replace(" And ", " and ")
     for direct in DIRECTIONS:
+        clean = re.sub(rf"(?i)(\b){direct}(\b)", rf"\1{direct}\2", clean)
         clean = clean.replace(f", {direct}", f" {direct}")
         clean = re.sub(rf"(?i)(\b){direct} and(\b)", rf"\1and\2", clean)
     for sep in [" - ", ",", "("]:
