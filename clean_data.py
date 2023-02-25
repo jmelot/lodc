@@ -10,45 +10,285 @@ CLEAN_SHEET_COLS = ["Date", "Bird Species, if known", "Clean Bird Species", "Sex
                                      "Address where found", "Clean Address", "CW Number", "Disposition",
                                      "Status: Released-- Nearest address/landmark", "Last Name", "What route?",
                                      "Status", "Approx. time you found the bird"]
-ADDRESS_REPLACEMENTS = [("Consitution", "Constitution"),
-                        ("Maine SW", "Maine Ave SW"),
-                        ("First", "1st"),
-                        ("Second", "2nd"),
-                        ("Third", "3rd"),
-                        ("Fourth", "4th"),
-                        ("Fifth", "5th"),
-                        ("Sixth", "6th"),
-                        ("Seventh", "7th"),
-                        ("Eighth", "8th"),
-                        ("Ninth", "9th"),
-                        ("Street", "St"),
-                        ("Avenue", "Ave"),
-                        ("AVE", "Ave"),
-                        (" st ", " St "),
-                        ("N Capitol St", "North Capitol St"),
-                        ("Circke", "Circle"),
-                        ("Condos", "Condominiums"),
-                        ("Bldg", "Building"),
-                        ("Thurgood Marshall or 400 North Capitol", "Thurgood Marshall Building"),
-                        ("MLK Jr", "MLK"),
-                        ("Collumbus", "Columbus"),
-                        ("Nationals Park Stadium", "Nationals Stadium"),
-                        ("Convention Center SE", "Convention Center"),
-                        ("Building E facing window", "building"),
-                        ("Mass Ave", "Massachusetts Ave"),
-                        ("Middle of sidewalk in front of Metropolitan News", ""),
-                        (" in the corner with CVS entrance", ""),
-                        (" east side at corner", ""),
-                        (" Giant", ""),
-                        (" DC 20002", ""),
-                        (" on the MBT trail", ""),
-                        (" North side", ""),
-                        (" In nook of the building on the 21st St side", ""),
-                        (" in front of pool window", ""),
-                        (" in front of parking garage entrance", ""),
-                        ("Thurgod Marshall Building", "Thurgood Marshall Building"),
-                        ("MLK library", "MLK Library")
-                       ]
+UNKNOWN_ADDRESS = "Unknown"
+AUDI = "100 Potomac Ave SW"
+CUA = "620 Michigan Ave NE"
+CITY_CENTER = "825 10th St NW"
+GU_LAW = "600 New Jersey Ave NW"
+GU = "3700 O St NW"
+THURGOOD = "1 Columbus Circle NE"
+MLK = "901 G St NW"
+HART_SENATE = "120 Constitution Ave NE"
+TEAMSTERS = "25 Louisiana Ave NW"
+CONVENTION_CTR = "801 Mt Vernon Pl NW"
+ADDRESS_REPLACEMENTS = [
+    ("corner at 7th and New York Ave NW", ""),
+    ("at the corner with Palmer Alley NW", ""),
+    ("NE Building", ""),
+    ("Consitution", "Constitution"),
+    ("Maine SW", "Maine Ave SW"),
+    ("First", "1st"),
+    ("Second", "2nd"),
+    ("Third", "3rd"),
+    ("Fourth", "4th"),
+    ("Fifth", "5th"),
+    ("Sixth", "6th"),
+    ("Seventh", "7th"),
+    ("Eighth", "8th"),
+    ("Ninth", "9th"),
+    ("Street", "St"),
+    ("Avenue", "Ave"),
+    ("AVE", "Ave"),
+    (" st ", " St "),
+    ("N Capitol St", "North Capitol St"),
+    ("Circke", "Circle"),
+    ("Condos", "Condominiums"),
+    ("Bldg", "Building"),
+    ("Thurgood Marshall or 400 North Capitol", THURGOOD),
+    ("MLK Jr", MLK),
+    ("Collumbus", "Columbus"),
+    ("Nationals Park Stadium", "Nationals Stadium"),
+    ("Convention Center SE", CONVENTION_CTR),
+    ("Building E facing window", "building"),
+    ("Mass Ave", "Massachusetts Ave"),
+    ("Middle of sidewalk in front of Metropolitan News", ""),
+    (" in the corner with CVS entrance", ""),
+    (" east side at corner", ""),
+    (" Giant", ""),
+    (" DC 20002", ""),
+    (" on the MBT trail", ""),
+    (" North side", ""),
+    (" In nook of the building on the 21st St side", ""),
+    (" in front of pool window", ""),
+    (" in front of parking garage entrance", ""),
+    ("Thurgod Marshall Building", THURGOOD),
+    ("MLK library", MLK),
+    ('In front of the entrance labeled "Stonebridge Carras"', "151 N St NE"),
+    ("1010 10th St", "1010 10th St NW"),
+    ("1050 17th St NW at L St", "1050 17th St NW"),
+    ("1050 K St NW parking garage entrance", "1050 K St NW"),
+    ("1090 I St NW WDC 20268", "1090 I St NW"),
+    ("111 Massachusetts NW", "111 Massachusetts Ave NW"),
+    ("1111 19th NW", "1111 19th St NW"),
+    ("1111 20th St", "1111 20th St NW"),
+    ("NY Ave ", "New York Ave "),
+    (" Sts ", " St "),
+    ("Dan found the bird at the DOEE building He will take it to CW", ""),
+    (" Place ", " Pl "),
+    ("N Carolina", "North Carolina"),
+    ("1313 L St NW in bike lane", "1313 L St NW"),
+    ("1331 Pennysylvania Ave NW", "1331 Pennsylvania Ave NW"),
+    ("13th and U St NW NW corner near Alero", "13th and U St NW"),
+    ("1815 7th St NW by the Shaw metro entrance", "1815 7th St NW"),
+    ("18th and P St NW NE corner", "18th and P St NW"),
+    ("circle", "Circle"),
+    ("1010 10th St NW NW", "1010 10th St NW"),
+    ("1201 15th St", "1201 15th St NW"),
+    ("1500 bl 32nd St NW", "1500 32nd St NW"),
+    ("NW NW", "NW"),
+    (" at the corner with Palmer Alley NW", ""),
+    ("1201 15th St", "1201 15th St NW"),
+    ("15th and L St", "15th and L St NW"),
+    ("17th and L", "17th and L St NW"),
+    ("810 7th St SE or NW?", "810 7th St NW"),
+    (" near Lafayette Park", ""),
+    ("Audi Field Club shop", AUDI),
+    ("Audi Stadium", AUDI),
+    ("Audi Stadium by store door fronting R St SW and facing North", AUDI),
+    ("BB&T Bank", UNKNOWN_ADDRESS),
+    ("Brookland in northeast DC", UNKNOWN_ADDRESS),
+    ("CUA campus", CUA),
+    ("City Center courtyard", CITY_CENTER),
+    ("City Center: Burberry", CITY_CENTER),
+    ("City Center: H St and 10th", CITY_CENTER),
+    ("Adas Israel historic synagogue at 3rd and F NW", "3rd St and F St NW"),
+    ("Air and Space Museum", "600 Independence Ave SW"),
+    ("Arena Stage", "1101 6th St SW"),
+    ("Close to the Embassy of Afghanistan", "2233 Wisconsin Ave NW"),
+    ("Coast Guard Building SE", "2703 Martin Luther King Jr Ave SE"),
+    ("Conn Ave NW", "Connecticut Ave NW"),
+    ("18th and Pennsylvania NW", "18th and Pennsylvania Ave NW"),
+    (" and Bouqueria Entrance", ""),
+    ("NW and", "NW"),
+    ("NE and", "NE"),
+    (" corner of 7th and Mt Vernon", ""),
+    ("Convention Center corner at 7th and NY Ave", "7th St and New York Ave NW"),
+    ("Convention Center overpass", "801 Mt Vernon Pl NW"),
+    ("Corner of H St and 18th", "H St and 18th St NW"),
+    ("Corner of New Jersey and D St NW", "New Jersey Ave and D St NW"),
+    ("Date and location unknown", UNKNOWN_ADDRESS),
+    ("Dept of Transportation near Navy Yard", "250 M St SE"),
+    ("Dior", "933 Palmer Alley NW"),
+    ("Dumbarton Oaks Greenhouse", ""),
+    ("E St", ""),
+    ("EMS Station", UNKNOWN_ADDRESS),
+    ("Eagle Bank NW corner", "700 K St NW"),
+    ("Eagle Company", UNKNOWN_ADDRESS),
+    ("Eastern Ave", ""),
+    ("Eastern Market", ""),
+    ("Entrance", ""),
+    ("FS Key Park", "1198 34th and M St NW"),
+    ("Road", "rd"),
+    ("Found in front of 1050 17th St NW", "1050 17th St NW"),
+    ("Found in front of Dolcezza north of Dupont Circle", "1704 Connecticut Ave NW"),
+    ("Found in the courtyard of 1616 P St NW", "1616 P St NW"),
+    ("Freshly dead ovenbird found in front of my small apartment building when I returned home from my route 1917 2nd St NE The glass entry door often has a light on inside all night", "1917 2nd St NE"),
+    ("Front of BBT Bank", UNKNOWN_ADDRESS),
+    ("GU Law Center", GU_LAW),
+    ("GU Law School", GU_LAW),
+    ("GU Law School Fitness Center", GU_LAW),
+    ("GU Law School Library", "111 G St NW"),
+    ("GU Sport and Fitness Center", GU_LAW),
+    ("GW Hospital", "3800 Reservoir Rd NW"),
+    ("Georgetown University Lauinger Library", GU),
+    ("Georgetown Law School", GU_LAW),
+    ("Georgetown Law School Fitness Center", GU_LAW),
+    ("Georgetown Law Sport and Fitness Center", GU_LAW),
+    ("Georgetown University", GU_LAW),
+    ("Georgetown University Law School", GU_LAW),
+    ("Georgetown University", GU),
+    ("Georgetown University at New North Hall glass doors", GU),
+    ("GWU", "2121 I St NW"),
+    ("Glass Entry 430 E St NW Wash DC", "430 E St NW"),
+    ("Glass entry 430 E St NW WDC", "430 E St NW"),
+    ("Grey Catbird found dead on ground of outdoor patio of Milk Bar on 1090 I St NW", "1090 I St NW"),
+    ("Husband found the bird Juvenile On sidewalk in front of the Georgetown Valet shop at 145 N St NE", "145 N St NE"),
+    ("I found this bird while on my lunch break It was still warm at approx 1 pm Found in front of 1040 17th St NW", "1040 17th St NW"),
+    ("In front of Audi Field Sports Shop main door facing north R St SW", AUDI),
+    ("M St side of 1275 1st St NE", "1275 1st St NE"),
+    ("M and 17th NW corner", "M St and 17th Tt NW"),
+    ("South side of 1601 K St", "1601 K St NW"),
+    ("glass entry 430 E St NW", "430 E St NW"),
+    ("World Bank 1818 H St NW", "1818 H St NW"),
+    ("No address", UNKNOWN_ADDRESS),
+    ("Other", UNKNOWN_ADDRESS),
+    ("This was at 700 2nd street NE As we started to drive home", "700 2nd St NE"),
+    ("in front of Tesla store on 9th St", "909 H St NW"),
+    ("Glover Archibold Park", UNKNOWN_ADDRESS),
+    ("Hall of States", "400-444 North Capitol St NW"),
+    ("Harbour Square Condominiums", "500 N St SW"),
+    ("Hart Senate Building", HART_SENATE),
+    ("Hart Senate Office Building", HART_SENATE),
+    ("In front of Spy Museum below windows facing west", "700 L'Enfant Plaza SW"),
+    ("MLK Library", MLK),
+    ("Marie H Reed Recreation Center NW", "2200 Champlain St NW"),
+    ("Marriott Marquis Washington", "901 Massachusetts Ave NW"),
+    ("Martin Luther King Jr Memorial Library", MLK),
+    ("Martin Luther King Library", MLK),
+    ("National Arboretum", UNKNOWN_ADDRESS),
+    ("National Geographic", "1145 17th St NW"),
+    ("National Mall", UNKNOWN_ADDRESS),
+    ("National Zoo", "3001 Connecticut Ave NW"),
+    ("Nationals Stadium", "1500 S Capitol St SE"),
+    ("Old Soldiers and Sailors Home NW", "140 Rock Creek Church Rd NW #7"),
+    ("On east side of Metropolitan Branch Trail at R St NE", "Metropolitan Branch Trail and R St NE"),
+    ("One Dupont Circle", "1 Dupont Circle NW"),
+    ("One Dupont Circle NW side", "1 Dupont Circle NW"),
+    ("Del Frisco's restaurant in courtyard", ""),
+    ("Potbelly", "1050 K St NW"),
+    ("Riverside Condominiums", "1435 4th St SW"),
+    ("Rock Creek Park Maintenance Yard", "Maintenance Rd NW"),
+    ("Rock Creek Stables", "5100 Glover Rd NW"),
+    ("SEC", "100 F St NE"),
+    ("SEC Building", "100 F St NE"),
+    ("Senate Hart Building", HART_SENATE),
+    ("Shaw Metro Station", "1701 8th St NW"),
+    ("Souvenir City", "1001 K St NW"),
+    ("TD Bank", "1753 Connecticut Ave NW"),
+    ("TMB", THURGOOD),
+    ("Teamster Building", TEAMSTERS),
+    ("Teamsters Building", TEAMSTERS),
+    ("Teamsters' Building", TEAMSTERS),
+    ("Techworld Plaza", "800 K St NW"),
+    ("The Convention Center", CONVENTION_CTR),
+    ("The National Zoo", "3001 Connecticut Ave NW"),
+    ("Thurgood Marshall", THURGOOD),
+    ("Thurgood Marshall Building", THURGOOD),
+    ("Tumi Store", "1051 H St NW"),
+    ("Washington DC", UNKNOWN_ADDRESS),
+    ("Washington Monument", "2 15th St NW"),
+    ("601 K St NW AC Hotel", "601 K St NW"),
+    ("Kingman Island", UNKNOWN_ADDRESS),
+    (" on south facing window of B Building Opposite Ft McNair Closest intersection is P and 4th SW", ""),
+    ("455 Massachusetts Avenu NW", "455 Massachusetts Ave NW"),
+    ("NJ Ave", "New Jersey Ave"),
+    ("NY Ave", "New York Ave"),
+    ("bl 32nd St NW", "block of 32nd St NW"),
+    ("601 Massachusetts Ave/601 K St", "601 Massachusetts Ave NW"),
+    ("new Jersey Ave", "New Jersey Ave"),
+    ("Georgia W", UNKNOWN_ADDRESS),
+    ("Washington", UNKNOWN_ADDRESS),
+    ("No address", UNKNOWN_ADDRESS),
+    (" by store door fronting R St SW and facing North", ""),
+    (" A Building by front door on north side of building", ""),
+    (" B Building", ""),
+    (" Building A Breezeway north side", ""),
+    (" Building B", ""),
+    ("600 New Jersey Ave NNW", "600 New Jersey Ave NW"),
+    ("600 New Jersey Ave NW Fitness Center", "600 New Jersey Ave NW"),
+    ("600 New Jersey Ave NW Law School", "600 New Jersey Ave NW"),
+    ("600 New Jersey Ave NW Library", "600 New Jersey Ave NW"),
+    ("600 New Jersey Ave NW at New North Hall glass doors", "600 New Jersey Ave NW"),
+    ("601 Massachusetts Ave Building", "601 Massachusetts Ave NW"),
+    (" at the corner with Palmer Alley NW", ""),
+    ("8th and I St corner Across TechWorld", "8th St and I St NW"),
+    ("in front of Veterans Affairs building", ""),
+    ("at the corner with Palmer Alley NW", ""),
+    ("near Lafayette Park", ""),
+    ("9th St side between G and H streets", ""),
+    ("in front of main facade", ""),
+    ("901 G St NW Library", "901 G St NW"),
+    ("901 G St NW 901 G St NW", "901 G St NW"),
+    (": next to curb in road", ""),
+]
+PRE_CLEAN_ADDRESS_REPLACEMENTS = [
+    ("entry, 430 E St NW, WDC", "430 E St NW"),
+    ("Glass Entry 430 E St., NW Wash DC", "430 E St NW"),
+    ("Glass entry 430 E St NW. WDC", "430 E St NW"),
+    ("Glass entry, 430 E ST., NW WDC", "430 E St NW"),
+    ("Glass entry, 430 E St NW, WDC", "430 E St NW"),
+    ("Glass entry, 430 E St., NW WDC", "430 E St NW"),
+    ("Glass entry, 430 E St., NW WDC 20001", "430 E St NW"),
+    ("Glass entry, 430 E St., NW, WDC", "430 E St NW"),
+    ("Glass entry, 430 E st., NW WDC 20001", "430 E St NW"),
+    ("Glass entry, west side 430 E St., NW WDC", "430 E St NW"),
+    ("entry, 430 E St NW WDC", "430 E St NW"),
+    ("entry, 430 E St NW, WDC", "430 E St NW"),
+    ("glass entry 430 E St., NW", "430 E St NW"),
+    ("glass entry, 430 E St NW, WDC", "430 E St NW"),
+    ("glass entry, 430 E St., NW, WDC", "430 E St NW"),
+    ("Found at NW corner (8th & P side) of the newer apartment building at 1490 7th St NW (the north half of the building containing the Giant).", "1490 7th St NW"),
+    ("Whole Foods, 6th St, NE", "600 H St NE"),
+    ("Glass entry, 430 E ST.", "430 E St NW"),
+    ("Glass entry 430 E St NW. WDC", "430 E St NW"),
+    ("Glass entry, 430 E St., NW", "430 E St NW"),
+    ("Glass entry, 430 E st., NW", "430 E St NW"),
+    ("Glass entry, 430 E ST., NW ", "430 E St NW"),
+    ("Glass entry, 430 E ST., NW ", "430 E St NW"),
+    ("Glass entry, 430 E St NW, WDC", "430 E St NW"),
+    ("Glass entry, 430 E St NW, WDC", "430 E St NW"),
+    ("Glass entry, 430 E St., NW", "430 E St NW"),
+    ("Glass entry, 430 E St., NW, WDC", "430 E St NW"),
+    ("Glass entry, west side", UNKNOWN_ADDRESS),
+    ("glass entry, 430 E St NW, WDC", "430 E St NW"),
+    ("430 E St. NW, glass entry", "430 E St NW"),
+    ("glass entry 430 E St., NW", "430 E St NW"),
+    ("glass entry 430 E St., NW", "430 E St NW"),
+    ("entry, 430 E St NW", "430 E St NW"),
+    ("entry, 430 E St NW, WDC", "430 E St NW"),
+    ("Eagle Bank, NW corner, 20th and K Sts. NW", "20th St NW and K St NW"),
+    ("NW corner, 18th and K Sts. NW", "18th St and K St NW"),
+    ("1000, Massachusetts Ave NW ", "1000 Massachusetts Ave NW"),
+    ("950 - 980 Maine SW, east side between buildings", "950-980 Maine Ave SW"),
+    ("Alley, Capitol Hill", UNKNOWN_ADDRESS),
+    ("2701 MLK Ave SE", "2701 Martin Luther King Jr Ave SE"),
+    ("1 Columbus Circle NE Building", "1 Columbus Circle NE"),
+    ("glass entry, 430 E St NW, WDC", "430 E St NW"),
+    ("430 E St. NW, glass entry", "430 E St NW"),
+    ("glass entry, 430 E St., NW, WDC", "430 E St NW"),
+    ("glass entry 430 E St., NW", "430 E St NW"),
+]
+
 ADDRESS_ENDINGS = ["Condominiums", "Library"]
 BIRD_SUBSTRING_MAPPINGS = [
     ("?", ""), ("sp.", "species"),
@@ -143,10 +383,13 @@ def clean_address(addr: str) -> str:
     :param addr: address string to be normalized
     :return: normalized address
     """
-    no_addr = "No address"
     if not addr:
-        return no_addr
-    clean = addr.replace(".", "").split(";")[0]
+        return UNKNOWN_ADDRESS
+    clean = " ".join(addr.replace("\n", " ").replace("\r", " ").split())
+    for s_from, s_to in PRE_CLEAN_ADDRESS_REPLACEMENTS:
+        clean = clean.replace(s_from, s_to)
+    clean = addr.replace(".", "").split(";")[0].strip().replace("\n", " ")
+    clean = clean.replace("&", "and").replace(" And ", " and ")
     for direct in DIRECTIONS:
         clean = clean.replace(f", {direct}", f" {direct}")
         clean = re.sub(rf"(?i)(\b){direct}(\b)", rf"\1{direct}\2", clean)
@@ -166,8 +409,53 @@ def clean_address(addr: str) -> str:
         clean = re.sub(rf"({ending}).*", r"\1", clean)
     clean = re.sub(r" to the right.*", "", clean)
     clean = re.sub("-+", "-", clean)
-    clean = clean.replace("Thurgood Marshall Building NW", "Thurgood Marshall Building")
-    return clean if clean else no_addr
+    clean = clean.replace("Thurgood Marshall Building NW", THURGOOD).replace(" NE Building", "")
+    clean = clean.replace("NW NW", "NW")
+    for from_s, to_s in [
+        ("1 Columbus Circle NW", "1 Columbus Circle NE"),
+        ("1 Columbus Circle", "1 Columbus Circle NE"),
+        ("920 Mass", "920 Massachusetts Ave NW"),
+        ("900 Mass", "900 Massachusetts Ave NW"),
+        ("1 Dupont Circle NW side", "1 Dupont Circle NW"),
+        ("801 Mt Vernon Pl NW corner at 7th and New York Ave NW", "801 Mt Vernon Pl NW"),
+        ("850 10th St NW at the corner with Palmer Alley NW", "850 10th St NW"),
+        ("931 H St NW or 900 Palmer Alley NW", "900 Palmer Alley NW"),
+        ("Across from 1813 Wiltberger NW", "1813 Wiltberger NW"),
+        ("ATF Building", "99 New York Ave NE"),
+        ("Alley", UNKNOWN_ADDRESS),
+        ("BB and T Bank", UNKNOWN_ADDRESS),
+        ("Capital City Charter School", "100 Peabody St NW"),
+        ("Connecticut Ave NW M St NW", "Connecticut Ave and M St NW"),
+        ("Constitution Ave NW 10th St NW", "Constitution Ave and 10th St NW"),
+        ("Convention Center NW", CONVENTION_CTR),
+        ("Convention Center", CONVENTION_CTR),
+        ("DOE Building", "1000 Independence Avenue SW"),
+        ("Lauinger Library", GU),
+        ("Lincoln Memorial", "2 Lincoln Memorial Cir NW"),
+        ("M St NW 17th St NW", "M St and 17th St NW"),
+        ("M St and 17th Tt NW", "M St and 17th St NW"),
+        ("Found at NW corner", "1490 7th St NW"),
+        ("NW corner", "18th St and K St NW"),
+        ("O'Neill Federal Building", "200 C Street SW"),
+        ("The 3001 Connecticut Ave NW", "3001 Connecticut Ave NW"),
+        ("US Botanic Garden", "100 Maryland Ave SW"),
+        ("US Botanic Garden atrium", "100 Maryland Ave SW"),
+        ("US Capitol", "First St SE"),
+        ("Union Station", "50 Massachusetts Ave NE"),
+        ("Verizon Center", "601 F St NW"),
+        ("Whole Foods", UNKNOWN_ADDRESS),
+        ("Wisc and Massachusetts Ave NW", "Wisc Ave and Massachusetts Ave NW"),
+        ("entry", "430 E St NW"),
+        ("glass entry", "430 E St NW"),
+        ("glass entry 430 NW", "430 E St NW"),
+        ("1000", "1000 Massachusetts Ave NW"),
+        ("Glass entry", "430 E St NW"),
+        ("430 E", "430 E St NW"),
+        ("430 NW", "430 E St NW")
+    ]:
+        if clean == from_s:
+            clean = to_s
+    return clean if clean else UNKNOWN_ADDRESS
 
 
 def get_bird_gender(bird: str) -> str:
@@ -213,6 +501,32 @@ def get_variably_named_val(column_alts: list, line: OrderedDict) -> str:
             return line[alt]
 
 
+def clean_date(line: OrderedDict) -> str:
+    date = ""
+    if line.get("Date"):
+        date = line["Date"]
+    elif line.get("date"):
+        date = line["date"]
+    if not date:
+        print(line)
+        return "Unknown"
+    if "/" in date:
+        date_parts = date.strip().split("/")
+    else:
+        date_parts = date.strip().split("-")
+    if date == "9-30--2018":
+        return "2018-09-30"
+    if date == "10//28/20":
+        return "2020-10-28"
+    if len(date_parts) != 3:
+        print(f"Unexpected date format: {line}")
+        return "Unknown"
+    month = date_parts[0] if len(date_parts[0]) == 2 else "0"+date_parts[0]
+    day = date_parts[1] if len(date_parts[1]) == 2 else "0"+date_parts[1]
+    year = date_parts[2] if len(date_parts[2]) == 4 else "20"+date_parts[2]
+    return f"{year}-{month}-{day}"
+
+
 def get_cleaned_data(input_fi: str, year: int) -> tuple:
     """
     Cleans data, returning a tuple of dicts:
@@ -247,7 +561,7 @@ def get_cleaned_data(input_fi: str, year: int) -> tuple:
             cleaned_addr = clean_address(raw_addr)
             line["Clean Address"] = cleaned_addr
             line[DEFAULT_ADDR_COL] = raw_addr
-
+            line["Date"] = clean_date(line)
             cleaned_rows.append({k: v for k, v in line.items() if k in CLEAN_SHEET_COLS})
             if cleaned_addr not in address_to_bird:
                 address_to_bird[cleaned_addr] = {year: {}}
