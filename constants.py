@@ -101,8 +101,6 @@ ADDRESS_REPLACEMENTS = [
     ("Conn Ave NW", "Connecticut Ave NW"),
     ("18th and Pennsylvania NW", "18th and Pennsylvania Ave NW"),
     (" and Bouqueria Entrance", ""),
-    ("NW and", "NW"),
-    ("NE and", "NE"),
     (" corner of 7th and Mt Vernon", ""),
     ("Convention Center corner at 7th and NY Ave", "7th St and New York Ave NW"),
     ("Convention Center overpass", "801 Mt Vernon Pl NW"),
@@ -367,3 +365,4 @@ ALT_ADDR_COLS = [DEFAULT_ADDR_COL, "Chinatown Route: Closest Address", "Union St
             "Location ", "Location", "Location                          (all District of Columbia addresses)"]
 DEFAULT_BIRD_COL = "Bird Species, if known"
 ALT_BIRD_COLS = [DEFAULT_BIRD_COL, "Species", "species"]
+UNKNOWN_DATE = "Unknown"

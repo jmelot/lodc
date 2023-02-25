@@ -7,7 +7,8 @@ from pathlib import Path
 
 from constants import ADDRESS_ENDINGS, ADDRESS_REPLACEMENTS, ALT_ADDR_COLS, ALT_BIRD_COLS, \
     BIRD_REPLACEMENTS, BIRD_SUBSTRING_MAPPINGS, CLEAN_SHEET_COLS, CONVENTION_CTR, DEFAULT_ADDR_COL, \
-    DEFAULT_BIRD_COL, DIRECTIONS, GU, PRE_CLEAN_ADDRESS_REPLACEMENTS, THURGOOD, UNKNOWN_ADDRESS, UNKNOWN_BIRD
+    DEFAULT_BIRD_COL, DIRECTIONS, GU, PRE_CLEAN_ADDRESS_REPLACEMENTS, THURGOOD, \
+    UNKNOWN_ADDRESS, UNKNOWN_BIRD, UNKNOWN_DATE
 
 
 def clean_address(addr: str) -> str:
@@ -21,13 +22,11 @@ def clean_address(addr: str) -> str:
     clean = " ".join(addr.replace("\n", " ").replace("\r", " ").split())
     for s_from, s_to in PRE_CLEAN_ADDRESS_REPLACEMENTS:
         clean = clean.replace(s_from, s_to)
-    clean = addr.replace(".", "").split(";")[0].strip().replace("\n", " ")
+    clean = clean.replace(".", "").split(";")[0].strip().replace("\n", " ")
     clean = clean.replace("&", "and").replace(" And ", " and ")
     for direct in DIRECTIONS:
         clean = clean.replace(f", {direct}", f" {direct}")
-        clean = re.sub(rf"(?i)(\b){direct}(\b)", rf"\1{direct}\2", clean)
-    if "&" not in clean:
-        clean = re.sub(rf"(\b)({'|'.join(DIRECTIONS)})(\b)", r"\1\2", clean).strip()
+        clean = re.sub(rf"(?i)(\b){direct} and(\b)", rf"\1and\2", clean)
     for sep in [" - ", ",", "("]:
         clean = clean.split(sep)[0]
     for s_from, s_to in ADDRESS_REPLACEMENTS:
@@ -146,19 +145,15 @@ def clean_date(line: OrderedDict) -> str:
     elif line.get("date"):
         date = line["date"]
     if not date:
-        print(line)
-        return "Unknown"
-    if "/" in date:
-        date_parts = date.strip().split("/")
-    else:
-        date_parts = date.strip().split("-")
-    if date == "9-30--2018":
-        return "2018-09-30"
-    if date == "10//28/20":
-        return "2020-10-28"
+        print(f"No date column in {line}")
+        return UNKNOWN_DATE
+    separators = ["/", "-"]
+    for separator in separators:
+        if separator in date:
+            date_parts = [p for p in date.strip().split(separator) if p]
     if len(date_parts) != 3:
         print(f"Unexpected date format: {line}")
-        return "Unknown"
+        return UNKNOWN_DATE
     month = date_parts[0] if len(date_parts[0]) == 2 else "0"+date_parts[0]
     day = date_parts[1] if len(date_parts[1]) == 2 else "0"+date_parts[1]
     year = date_parts[2] if len(date_parts[2]) == 4 else "20"+date_parts[2]
