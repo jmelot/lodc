@@ -502,6 +502,11 @@ def get_variably_named_val(column_alts: list, line: OrderedDict) -> str:
 
 
 def clean_date(line: OrderedDict) -> str:
+    """
+    Normalize date to YYYY-MM-DD format
+    :param line: Row of data
+    :return: Normalized date
+    """
     date = ""
     if line.get("Date"):
         date = line["Date"]
@@ -554,6 +559,7 @@ def get_cleaned_data(input_fi: str, year: int) -> tuple:
                 continue
             line[DEFAULT_BIRD_COL] = raw_bird
             line["Clean Bird Species"] = cleaned_bird
+
             # clean up address
             raw_addr = get_variably_named_val(ALT_ADDR_COLS, line)
             if not raw_addr:
@@ -649,6 +655,11 @@ def main(input_fi: str, year: int, output_stub: str) -> None:
 
 
 def get_year(filename: str) -> int:
+    """
+    Parse year (first four-digit sequence) out of filename
+    :param filename: LODC-formatted filename
+    :return: Year when data was collected
+    """
     return int(re.search(r"\d\d\d\d", filename).group(0))
 
 
