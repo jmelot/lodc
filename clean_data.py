@@ -139,7 +139,7 @@ def get_cleaned_data(input_fi: str, year: int) -> tuple:
         for line in csv.DictReader(f):
             # clean up bird species
             raw_bird = get_variably_named_val(ALT_BIRD_COLS, line)
-            if (not raw_bird) or (raw_bird == "Not used"):
+            if (not raw_bird) or (raw_bird == "Not used") or re.search(r"(?i)Total:\s*\d+\s*birds", str(line)):
                 continue
             if not "Sex, if known" in line:
                 line["Sex, if known"] = get_bird_gender(raw_bird)
