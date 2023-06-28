@@ -41,13 +41,17 @@ def clean_address(addr: str) -> str:
     clean = re.sub(r"Condominium(\b)", r"Condominiums\1", clean)
     for needs_nw in NEEDS_NW:
         clean = re.sub(rf"{needs_nw}\s*$", f"{needs_nw} NW", clean)
+    for needs_ne in ["1701 Rhode Island Ave"]:
+        clean = re.sub(rf"{needs_ne}\s*$", f"{needs_ne} NE", clean)
     clean = re.sub(r"NW\s*/.*", "NW", clean)
     clean = " ".join(clean.strip().split())
     for ending in ADDRESS_ENDINGS:
         clean = re.sub(rf"({ending}).*", r"\1", clean)
     clean = re.sub(r" to the right.*", "", clean)
     clean = re.sub("-+", "-", clean)
-    clean = clean.replace("NW NW", "NW")
+    clean = clean.replace("NW NW", "NW").replace("NE NE", "NE").replace("SW SW", "SW")
+    clean = re.sub(r" #.*", "", clean)
+    return re.sub(r" between.*", "", clean)
     return clean if clean else UNKNOWN_ADDRESS
 
 
@@ -79,6 +83,9 @@ def clean_bird(bird: str) -> str:
     if ("Unidentified" in bird) or ("Unknown" in bird):
         bird = UNKNOWN_BIRD
     bird = re.sub(r" Sp$", " Species", bird)
+    bird = re.sub(r" \d+\s*$", "", bird)
+    if " or " in bird.lower():
+        return UNKNOWN_BIRD
     return bird.strip()
 
 

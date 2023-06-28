@@ -221,9 +221,42 @@ ADDRESS_REPLACEMENTS = [
     ("901 G St NW 901 G St NW", MLK),
     (": next to curb in road", ""),
     ("ATF Building", "99 New York Ave NE"),
-    ("Building", "")
+    (" river side of building in front of glass doors", ""),
+    ("Building", ""),
+    (" side", ""),
+    (" side midway along the building", ""),
+    (" corner courtyard", ""),
+    (" facing river in front of doors", ""),
+    (" facing river to left of glass doors", ""),
+    ("101 Constitution Ave NW on Louisiana Ave", "101 Constitution Ave NW"),
+    ("1050 17th St NW on 17th St", "1050 17th St NW"),
+    (" on northern", ""),
+    ("1275 New Jersey Ave East midway along the building", "1275 New Jersey Ave SE"),
+    (" in sunken patio at southeast corner", ""),
+    (" of building", ""),
+    (" Apt T8E", ""),
+    (" near entrance door on P St", ""),
+    ("City Center: ", ""),
+    ("at door entrance", ""),
+    ("not given", ""),
+    ("under glass walkway", ""),
+    (" #409", ""),
+    (" Franklin Park South", ""),
+    (" #7", ""),
+    (" bldg east window", ""),
+    (" by double doors", ""),
+    (" at 4th and P SW A Breezeway south side", ""),
+    (" Apt 103", ""),
+    (" WDC 20036", ""),
+    (" SW Corner", ""),
+    ("NW New", "NW"),
+    (" Reported to CW", ""),
+    (" in sunken patio at southeast corner of building", ""),
+    (" near entrance Next to the scarlet tanager remnants that I reported on 10/8/22 Either a kinglet or a warbler with wing bars Not fresh", ""),
+    (" near entrance door on P St side", "")
 ]
 PRE_CLEAN_ADDRESS_REPLACEMENTS = [
+    ("Riverside Condominiums", "1435 4th St SW"),
     ("900 Mass. (So. side at glass passageway)", "900 Massachusetts Ave NW"),
     ("1000, Massachusetts Ave NW", "1000 Massachusetts Ave NW"),
     ("799 9th St NW and Bouqueria Entrance", "799 9th St NW"),
@@ -299,7 +332,15 @@ ALWAYS_SUBS = [
     (r"(?i)^DOE Building", DOE),
     (r"(?i)Lauinger Library", GU),
     (r"(?i)Thurgood Marshall", THURGOOD),
-    (r"(?i)Capital City Charter School", CAP_CITY_SCHOOL)
+    (r"(?i)Capital City Charter School", CAP_CITY_SCHOOL),
+    ("Alexander Court", "2001 K St NW"),
+    ("River Park Coop", "1301 Delaware Ave SW"),
+    (r"(?i).*riverside condominiums?.*", "1435 4th St SW"),
+    ("SW Library", "900 Wesley Pl SW"),
+    ("Signal House", "1255 Union St NE"),
+    ("Smithsonian Castle Haupt Garden", "1050 Independence Ave SW"),
+    (r"(?i).*unconventional diner.*", "1207 9th St NW"),
+    ("Kennedy Center", "2700 F St NW")
 ]
 
 ADDRESS_ENDINGS = ["Condominiums", "Library"]
@@ -379,7 +420,9 @@ BIRD_REPLACEMENTS = [("Dove/Pigeon", "Rock Dove"),
                      ("Starling", "European Starling"),
                      ("Warbler", "Warbler Species"),
                      ("Empidonax Species Flycatcher", EMPID),
-                     ("Mockingbird", "Northern Mockingbird")
+                     ("Mockingbird", "Northern Mockingbird"),
+                     ("Late Entries", UNKNOWN_BIRD),
+                     ("Coopers Hawk", "Cooper's Hawk")
                     ]
 DIRECTIONS = ["NE", "NW", "SE", "SW"]
 DEFAULT_ADDR_COL = "Address where found"
@@ -390,4 +433,4 @@ DEFAULT_BIRD_COL = "Bird Species, if known"
 ALT_BIRD_COLS = [DEFAULT_BIRD_COL, "Species", "species"]
 UNKNOWN_DATE = "Unknown"
 NEEDS_NW = ["Massachusetts Ave", "I St", "Palmer Alley", "New York Ave", "New Jersey Ave",
-            "Wisconsin Ave", "901 4th St"]
+            "Wisconsin Ave", "901 4th St", "21 Dupont Circle", "Benton St"]
