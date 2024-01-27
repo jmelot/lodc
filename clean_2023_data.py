@@ -1,6 +1,5 @@
 import argparse
 import csv
-import re
 from collections import OrderedDict
 from clean_data import clean_date_value, clean_bird, clean_address
 
@@ -23,7 +22,6 @@ def coalese(values: list) -> str:
     for v in values:
         if v and v != "Unknown":
             return v
-    return "Unknown"
 
 
 def clean_row(row: OrderedDict) -> OrderedDict:
@@ -34,11 +32,27 @@ def clean_row(row: OrderedDict) -> OrderedDict:
     cleaned = {
         "date": date,
         "address": coalese(addresses),
-        "bird": coalese(birds),
+        "species": coalese(birds),
         "cw_id": coalese(cw_ids)
     }
     row.update(cleaned)
     return row
+
+
+def get_canonical_row(rows: list) -> dict:
+    """
+
+    :param rows:
+    :return:
+    """
+    best_row = {}
+    for row in rows:
+        row_copy = {k: v for k, v in row.items()}
+        for k in row:
+            if not row[k]:
+                row_copy.pop(k)
+        best_row.update(row_copy)
+    return best_row
 
 
 def deduplicate(input_data: str, output_data: str) -> None:
@@ -48,19 +62,35 @@ def deduplicate(input_data: str, output_data: str) -> None:
     :param output_data:
     :return:
     """
-    clean_rows = []
+    key_to_rows = {}
     row_id = 0
+    max_col_row = {}
     with open(input_data) as f:
         for row in csv.DictReader(f):
             cleaned = clean_row(row)
             cleaned["id"] = row_id
-            clean_rows.append(cleaned)
+            key = f"{cleaned['date']}-{cleaned['address']}-{cleaned['bird']}"
+            if key not in key_to_rows:
+                key_to_rows[key] = []
+            key_to_rows[key].append(cleaned)
+            if len(row.keys()) > len(max_col_row.keys()):
+                max_col_row = row
             row_id += 1
     with open(output_data, mode="w") as out:
-        writer = csv.DictWriter(out, fieldnames=clean_rows[0].keys())
+        writer = csv.DictWriter(out, fieldnames=["merged_id"]+list(max_col_row.keys()))
         writer.writeheader()
-        for row in clean_rows:
-            writer.writerow(row)
+        for key, rows in key_to_rows.items():
+            merged_id = None
+            if len(rows) > 1:
+                canonical_row = get_canonical_row(rows)
+                canonical_row["merged_id"] = row_id
+                canonical_row["id"] = row_id
+                merged_id = row_id
+                writer.writerow(canonical_row)
+                row_id += 1
+            for row in rows:
+                row["merged_id"] = merged_id if merged_id else row["id"]
+                writer.writerow(row)
 
 
 if __name__ == "__main__":
