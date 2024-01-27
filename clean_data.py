@@ -51,7 +51,7 @@ def clean_address(addr: str) -> str:
     clean = re.sub("-+", "-", clean)
     clean = clean.replace("NW NW", "NW").replace("NE NE", "NE").replace("SW SW", "SW")
     clean = re.sub(r" #.*", "", clean)
-    return re.sub(r" between.*", "", clean)
+    clean = re.sub(r" between.*", "", clean)
     return clean if clean else UNKNOWN_ADDRESS
 
 
@@ -215,6 +215,15 @@ def write_address_counts(data: dict, output_prefix: str) -> None:
                     "Count": sum([data[address][year][bird] for bird in data[address][year]]),
                     "Year": year
                 })
+    with open(f"total_bldg_counts.csv", mode="w") as f:
+        writer = csv.DictWriter(f, fieldnames=["Building", "Count", "First Year"])
+        writer.writeheader()
+        for address in sorted(data.keys()):
+            writer.writerow({
+                "Building": address,
+                "Count": sum([data[address][year][bird] for year in data[address] for bird in data[address][year]]),
+                "First Year": min(data[address].keys())
+            })
 
 
 def write_bird_counts(data: dict, output_prefix: str) -> None:
