@@ -103,7 +103,7 @@ def get_variably_named_val(column_alts: list, line: OrderedDict) -> str:
 
 def clean_date(line: OrderedDict) -> str:
     """
-    Normalize date to YYYY-MM-DD format
+    Extract date from row and normalize to YYYY-MM-DD format
     :param line: Row of data
     :return: Normalized date
     """
@@ -115,6 +115,15 @@ def clean_date(line: OrderedDict) -> str:
     if not date:
         print(f"No date column in {line}")
         return UNKNOWN_DATE
+    return clean_date_value(date)
+
+
+def clean_date_value(date: str) -> str:
+    """
+    Normalize date to YYYY-MM-DD format
+    :param date: Unnormalized date
+    :return: Normalized date
+    """
     separators = ["/", "-"]
     for separator in separators:
         if separator in date:
@@ -126,6 +135,7 @@ def clean_date(line: OrderedDict) -> str:
     day = date_parts[1] if len(date_parts[1]) == 2 else "0"+date_parts[1]
     year = date_parts[2] if len(date_parts[2]) == 4 else "20"+date_parts[2]
     return f"{year}-{month}-{day}"
+
 
 
 def get_cleaned_data(input_fi: str, year: int) -> tuple:
