@@ -36,7 +36,10 @@ def clean_address(addr: str) -> str:
     for sep in [" - ", ",", "("]:
         clean = clean.split(sep)[0]
     for s_from, s_to in ADDRESS_REPLACEMENTS:
-        clean = clean.replace(s_from, s_to)
+        if s_from.startswith("^") and clean == s_from.strip("^"):
+            clean = s_to
+        else:
+            clean = clean.replace(s_from, s_to)
     clean = re.sub(r"(?i)\s+noma(\b|$)", "", clean)
     clean = re.sub(r"Condominium(\b)", r"Condominiums\1", clean)
     for needs_nw in NEEDS_NW:
@@ -108,10 +111,9 @@ def clean_date(line: OrderedDict) -> str:
     :return: Normalized date
     """
     date = ""
-    if line.get("Date"):
-        date = line["Date"]
-    elif line.get("date"):
-        date = line["date"]
+    for date_col in ["Date", "date", "Date Jotform (MMDDYYYY)"]:
+        if line.get(date_col):
+            date = line[date_col]
     if not date:
         print(f"No date column in {line}")
         return UNKNOWN_DATE
@@ -129,7 +131,7 @@ def clean_date_value(date: str) -> str:
         if separator in date:
             date_parts = [p for p in date.strip().split(separator) if p]
     if len(date_parts) != 3:
-        print(f"Unexpected date format: {line}")
+        print(f"Unexpected date format: {date}")
         return UNKNOWN_DATE
     month = date_parts[0] if len(date_parts[0]) == 2 else "0"+date_parts[0]
     day = date_parts[1] if len(date_parts[1]) == 2 else "0"+date_parts[1]

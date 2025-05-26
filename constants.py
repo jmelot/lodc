@@ -18,6 +18,7 @@ BOTANIC = "100 Maryland Ave SW"
 ZOO = "3001 Connecticut Ave NW"
 DOE = "1000 Independence Ave SW"
 CAP_CITY_SCHOOL = "100 Peabody St NW"
+NORTH_CAP = "400-444 North Capitol St NW"
 ADDRESS_REPLACEMENTS = [
     ("corner at 7th and New York Ave NW", ""),
     ("at the corner with Palmer Alley NW", ""),
@@ -35,7 +36,9 @@ ADDRESS_REPLACEMENTS = [
     ("Street", "St"),
     ("Avenue", "Ave"),
     ("AVE", "Ave"),
+    ("NW NW", "NW"),
     (" st ", " St "),
+    (" ST ", " St "),
     ("N Capitol St", "North Capitol St"),
     ("Circke", "Circle"),
     ("Condos", "Condominiums"),
@@ -80,9 +83,6 @@ ADDRESS_REPLACEMENTS = [
     ("1201 15th St", "1201 15th St NW"),
     ("1500 bl 32nd St NW", "1500 32nd St NW"),
     (" at the corner with Palmer Alley NW", ""),
-    ("1201 15th St", "1201 15th St NW"),
-    ("15th and L St", "15th and L St NW"),
-    ("17th and L", "17th and L St NW"),
     ("810 7th St SE or NW?", "810 7th St NW"),
     (" near Lafayette Park", ""),
     ("Audi Field Club shop", AUDI),
@@ -151,7 +151,7 @@ ADDRESS_REPLACEMENTS = [
     ("This was at 700 2nd street NE As we started to drive home", "700 2nd St NE"),
     ("in front of Tesla store on 9th St", "909 H St NW"),
     ("Glover Archibold Park", UNKNOWN_ADDRESS),
-    ("Hall of States", "400-444 North Capitol St NW"),
+    ("Hall of States", NORTH_CAP),
     ("Harbour Square Condominiums", "500 N St SW"),
     ("Hart Senate Building", HART_SENATE),
     ("Hart Senate Office Building", HART_SENATE),
@@ -171,7 +171,6 @@ ADDRESS_REPLACEMENTS = [
     ("One Dupont Circle NW side", "1 Dupont Circle NW"),
     ("Del Frisco's restaurant in courtyard", ""),
     ("Potbelly", "1050 K St NW"),
-    ("Riverside Condominiums", "1435 4th St SW"),
     ("Rock Creek Park Maintenance Yard", "Maintenance Rd NW"),
     ("Rock Creek Stables", "5100 Glover Rd NW"),
     ("SEC", "100 F St NE"),
@@ -253,10 +252,42 @@ ADDRESS_REPLACEMENTS = [
     (" Reported to CW", ""),
     (" in sunken patio at southeast corner of building", ""),
     (" near entrance Next to the scarlet tanager remnants that I reported on 10/8/22 Either a kinglet or a warbler with wing bars Not fresh", ""),
-    (" near entrance door on P St side", "")
+    (" near entrance door on P St side", ""),
+    ("314 Carroll Ave NW", "314 Carroll St NW"),
+    ("3145 Aberfoyle St NW", "3145 Aberfoyle Pl NW"),
+    (" Lane ", " Ln "),
+    ("^400-444 N Capitol St NW", NORTH_CAP),
+    ("^400-444 North Capitol Street NW", NORTH_CAP),
+    ("^400 N Capital St NW", NORTH_CAP),
+    ("^400 N Capitol NW", NORTH_CAP),
+    ("^400-444 N Capitol", NORTH_CAP),
+    ("^400-444 N Capitol?", NORTH_CAP),
+    ("^400/444 North Capitol St NW", NORTH_CAP),
+    ("^400/444 North Capitol St NW above entrance", NORTH_CAP),
+    ("^400 North Capitol St NW", NORTH_CAP),
+    ("^400 N Capitol St., NW", NORTH_CAP),
+    ("425 Barlow Place", "425 Barlow Pl Bethesda MD"),
+    ("^444 North Capitol St", NORTH_CAP),
+    ("^444 North Capitol St NW", NORTH_CAP),
+    ("500 N Capitol NW", "500 North Capitol St NE"),
+    ("500 N Capitoll?", "500 North Capitol St NE"),
+    ("500 North Capitol St NW", "500 North Capitol St NE"),
+    ("625 Monroe Ave NE", "625 Monroe St NE"),
+    ("700 Pennsylvania Ave SE Ste", "700 Pennsylvania Ave SE"),
+    ("7th and K St NW", "7th and K NW"),
+    ("811 4th St", "811 4th St NW"),
+    ("Massachusets", "Massachusetts"),
+    ("New Jersey and D NW", "New Jersey Ave and D St NW"),
+    ("^17th and L", "17th and L St NW"),
+    ("^25 Louisiana NW", "25 Louisiana Ave NW"),
+    ("1010 Massachusetts Ave NE", "1010 Massachusetts Ave NW"),
+    ("101 Constitution Ave SW", "101 Constitution Ave NW"),
+    ("1275 New Jersey Ave SW", "1275 New Jersey Ave SE"),
 ]
 PRE_CLEAN_ADDRESS_REPLACEMENTS = [
-    ("Riverside Condominiums", "1435 4th St SW"),
+    ("101 Constitution Avenue, SW, WDC 20001", "101 Constitution Ave NW"),
+    ("1010 Massachusetts Ave NE, near apartment entrance", "1010 Massachusetts Ave NW"),
+    ("1250 I St. St. NW, across Franklin Park", "1250 I St NW"),
     ("900 Mass. (So. side at glass passageway)", "900 Massachusetts Ave NW"),
     ("1000, Massachusetts Ave NW", "1000 Massachusetts Ave NW"),
     ("799 9th St NW and Bouqueria Entrance", "799 9th St NW"),
@@ -323,7 +354,13 @@ PRE_CLEAN_ADDRESS_REPLACEMENTS = [
     ("920 Mass. (N. side at glass passageway)", "920 Massachusetts Ave NW"),
     ("920 Mass. (So. side at glass passageway)", "920 Massachusetts Ave NW"),
     ("Across from 1813 Wiltberger NW, WeWork Shaw Building", "1813 Wiltberger St NW"),
-    ("One Dupont Circle, NW side", "1 Dupont Circle NW")
+    ("One Dupont Circle, NW side", "1 Dupont Circle NW"),
+    ("400 N Capital St NW (in front of Johnny's Halfshell)", NORTH_CAP),
+    ("444 N Capital St NW", NORTH_CAP),
+    ("444 N. Capital St NW (in front of red Wells Fargo signage)", NORTH_CAP),
+    ("444 N. Capital St NW (recessed area btwn Hall of States and Jonny's Halfshell))", NORTH_CAP),
+    ("444 North Capitol St NW (in courtyard)", NORTH_CAP),
+    ("550 First St. NE (Georgetown Law Fitness Center)", "550 1st St NW")
 ]
 ALWAYS_SUBS = [
     (r"(?i)^(The )?Convention Center", CONVENTION_CTR),
@@ -335,7 +372,7 @@ ALWAYS_SUBS = [
     (r"(?i)Capital City Charter School", CAP_CITY_SCHOOL),
     ("Alexander Court", "2001 K St NW"),
     ("River Park Coop", "1301 Delaware Ave SW"),
-    (r"(?i).*riverside condominiums?.*", "1435 4th St SW"),
+    (r"(?i).*riverside condo.*", "1435 4th St SW"),
     ("SW Library", "900 Wesley Pl SW"),
     ("Signal House", "1255 Union St NE"),
     ("Smithsonian Castle Haupt Garden", "1050 Independence Ave SW"),
@@ -428,9 +465,12 @@ DIRECTIONS = ["NE", "NW", "SE", "SW"]
 DEFAULT_ADDR_COL = "Address where found"
 ALT_ADDR_COLS = [DEFAULT_ADDR_COL, "Chinatown Route: Closest Address", "Union Station  Route: Closest Address",
             "address1", "address2", "Street Address", "Location Found", "Street Address Where Found", "notes",
-            "Location ", "Location", "Location                          (all District of Columbia addresses)"]
+            "Location ", "Location", "Location                          (all District of Columbia addresses)",
+            "Address, if not listed above", "Union Route: Closest Address", "Southwest: Closest Address",
+            "NoMa: Closest Address", "Address (BL)", "patients.address_found (CW)"]
 DEFAULT_BIRD_COL = "Bird Species, if known"
 ALT_BIRD_COLS = [DEFAULT_BIRD_COL, "Species", "species"]
 UNKNOWN_DATE = "Unknown"
 NEEDS_NW = ["Massachusetts Ave", "I St", "Palmer Alley", "New York Ave", "New Jersey Ave",
-            "Wisconsin Ave", "901 4th St", "21 Dupont Circle", "Benton St"]
+            "Wisconsin Ave", "901 4th St", "21 Dupont Circle", "Benton St", "1026 6th St", "1050 K St",
+            "1201 15th St", "15th and L St", "441 4th St"]
