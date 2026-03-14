@@ -111,7 +111,6 @@ ADDRESS_REPLACEMENTS = [
     ("EMS Station", UNKNOWN_ADDRESS),
     ("Eagle Bank NW corner", "700 K St NW"),
     ("Eagle Company", UNKNOWN_ADDRESS),
-    ("Eastern Ave", ""),
     ("Eastern Market", "225 7th St SE"),
     ("Entrance", ""),
     ("FS Key Park", "1198 34th and M St NW"),
@@ -459,7 +458,23 @@ BIRD_REPLACEMENTS = [("Dove/Pigeon", "Rock Dove"),
                      ("Empidonax Species Flycatcher", EMPID),
                      ("Mockingbird", "Northern Mockingbird"),
                      ("Late Entries", UNKNOWN_BIRD),
-                     ("Coopers Hawk", "Cooper's Hawk")
+                     ("Coopers Hawk", "Cooper's Hawk"),
+                     ("Black-And White Warbler", "Black-And-White Warbler"),
+                     ("Cooper's - Juvenile", "Cooper's Hawk"),
+                     ("Ruby-Throated", "Ruby-Throated Hummingbird"),
+                     ("Song Sparrows", "Song Sparrow"),
+                     ("Sparrow Species - House", "House Sparrow"),
+                     ("Suspect Ruby-Crowned Kinglet", "Ruby-Crowned Kinglet"),
+                     ("Worm Eating Warbler", "Worm-Eating Warbler"),
+                     ("Yelllow-Billed Cuckoo", "Yellow-Billed Cuckoo"),
+                     ("Unidentifiable", UNKNOWN_BIRD),
+                     ("Yellow-Shafted Flicker", "Northern Flicker"),
+                     ("Yellow Throated Warbler", "Yellow-Throated Warbler"),
+                     ("American Cardinal", "Northern Cardinal"),
+                     ("Gray Gnatcatcher", "Blue-Gray Gnatcatcher"),
+                     ("Great-Crested Flycatcher", "Great Crested Flycatcher"),
+                     ("Redstart", "American Redstart"),
+                     ("Very Flattened", UNKNOWN_BIRD)
                     ]
 DIRECTIONS = ["NE", "NW", "SE", "SW"]
 DEFAULT_ADDR_COL = "Address where found"
@@ -467,9 +482,9 @@ ALT_ADDR_COLS = [DEFAULT_ADDR_COL, "Chinatown Route: Closest Address", "Union St
             "address1", "address2", "Street Address", "Location Found", "Street Address Where Found", "notes",
             "Location ", "Location", "Location                          (all District of Columbia addresses)",
             "Address, if not listed above", "Union Route: Closest Address", "Southwest: Closest Address",
-            "NoMa: Closest Address", "Address (BL)", "patients.address_found (CW)"]
+            "NoMa: Closest Address", "Address (BL)", "patients.address_found (CW)", "Address", "Closest Address"]
 DEFAULT_BIRD_COL = "Bird Species, if known"
-ALT_BIRD_COLS = [DEFAULT_BIRD_COL, "Species", "species"]
+ALT_BIRD_COLS = [DEFAULT_BIRD_COL, "Species", "species", "Bird Species"]
 UNKNOWN_DATE = "Unknown"
 NEEDS_NW = ["Massachusetts Ave", "I St", "Palmer Alley", "New York Ave", "New Jersey Ave",
             "Wisconsin Ave", "901 4th St", "21 Dupont Circle", "Benton St", "1026 6th St", "1050 K St",
